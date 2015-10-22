@@ -1,1 +1,1 @@
- : E:\CWashCarTest1.7.0\bin\AndroidManifest.xml \
+ : e:\Git\bin\AndroidManifest.xml \

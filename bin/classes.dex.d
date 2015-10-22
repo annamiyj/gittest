@@ -1,10 +1,10 @@
-E:\CWashCarTest1.7.0\bin\classes.dex : \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\lib\FileOperation.class \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\lib\MyAssert.class \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\lib\MyEntry.class \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\lib\SetStep.class \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\lib\ToPage.class \
-E:\CWashCarTest1.7.0\bin\classes\com\baidu\recordreplay\test\MyTest.class \
-E:\CWashCarTest1.7.0\bin\classes\com\ganji\android\ccar\test\BuildConfig.class \
-E:\CWashCarTest1.7.0\bin\dexedLibs\adb4robotium_modified1.7.0-8d31647d467d7501581beed881953ea6.jar \
-E:\CWashCarTest1.7.0\bin\dexedLibs\cafe-711623de37001734cfbf0947aa81cb40.jar \
+e:\Git\bin\classes.dex : \
+e:\Git\bin\classes\com\baidu\recordreplay\test\lib\FileOperation.class \
+e:\Git\bin\classes\com\baidu\recordreplay\test\lib\MyAssert.class \
+e:\Git\bin\classes\com\baidu\recordreplay\test\lib\MyEntry.class \
+e:\Git\bin\classes\com\baidu\recordreplay\test\lib\SetStep.class \
+e:\Git\bin\classes\com\baidu\recordreplay\test\lib\ToPage.class \
+e:\Git\bin\classes\com\baidu\recordreplay\test\MyTest.class \
+e:\Git\bin\classes\com\ganji\android\ccar\test\BuildConfig.class \
+e:\Git\bin\dexedLibs\adb4robotium_modified1.7.0-47b86456fd6e9eb014b22e39f06c0776.jar \
+e:\Git\bin\dexedLibs\cafe-5b03684457e778edbb88b1be7a867e12.jar \
