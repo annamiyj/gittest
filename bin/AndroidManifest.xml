@@ -14,7 +14,10 @@
 		android:targetPackage="com.ganji.android.ccar" />
     <application>
         <uses-library android:name="android.test.runner" />
-        android:debuggable="true"
+        android:debug="true"
+        <uses-permission android:name = "android.permission.CAMERA" />
+        <uses-feature android:name = "android.hardware.camera" />
+        <uses-feature android:name = "android.hardware.camera" android:required = "false" />
     </application>
     
     

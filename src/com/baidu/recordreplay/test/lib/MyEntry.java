@@ -21,6 +21,7 @@ import android.R.integer;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -32,6 +33,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 public class MyEntry {
+	//所有入口
+	//一级入口
+	//活动入口
+
 
 	/**
 	 * 选择服务城市入口
@@ -109,8 +114,8 @@ public class MyEntry {
 	 * 首页入口
 	 * 首页底部tab1
 	 */
-	public static View homepageentry(LocalLib local) {
-		View home = local.getView("com.ganji.android.ccar:id/img_tab_icon",0);
+	public static RelativeLayout homepageentry(LocalLib local) {
+		RelativeLayout home = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_home");//1.7.0
 		return home;
 	}
 
@@ -118,8 +123,8 @@ public class MyEntry {
 	 * 我的订单入口
 	 * 首页底部tab2
 	 */
-	public static View myneedentry(LocalLib local) {
-		View myneed = local.getView("com.ganji.android.ccar:id/img_tab_icon",1);
+	public static RelativeLayout myneedentry(LocalLib local) {
+		RelativeLayout myneed = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_order_list");//1.7.0
 		return myneed;
 	}
 
@@ -127,9 +132,9 @@ public class MyEntry {
 	 * 我的页面入口
 	 * 首页底部tab3
 	 */
-	public static View mypageentry(LocalLib local) {
-		View myneed = local.getView("com.ganji.android.ccar:id/img_tab_icon",2);
-		return myneed;
+	public static RelativeLayout mypageentry(LocalLib local) {
+		RelativeLayout mypage = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_my_page");//1.7.0
+		return mypage;
 	}
 	
 	/**
@@ -222,6 +227,17 @@ public class MyEntry {
 		View redpackage = local.getView("com.ganji.android.ccar:id/txt_red_package_label");
 		return redpackage;
 	}	
+	
+	/**
+	 * 次卡选择按钮
+	 * 位置：上门洗车页
+	 */
+	public static CheckBox timecardcheckbox(LocalLib local) {
+		CheckBox timecardcheckbox = (CheckBox)local.getView("com.ganji.android.ccar:id/time_card_enable_switch");
+		return timecardcheckbox;
+	}	
+	
+	
 	
 	/**
 	 * 单选按钮
@@ -762,8 +778,46 @@ public class MyEntry {
 	 */
 	public static String password(LocalLib local) {
 		String password = "3423";
+//		String password = "852365";
 		return password;
 	}
+	
+	/**
+	 * 线上账号余额
+	 */
+	public static String balance(LocalLib local) {
+		String balance = "1112";
+//		String balance = "852365";
+		return balance;
+	}
+	
+	/**
+	 * 线上次卡次数
+	 */
+	public static String timecard(LocalLib local) {
+		String timecard = "123";
+//		String timecard = "852365";
+		return timecard;
+	}
+	
+	/**
+	 * 线上剩余次卡次数
+	 */
+	public static String bjtimecard(LocalLib local) {
+		String bjtimecard = "111";
+//		String timecard = "852365";
+		return bjtimecard;
+	}
+	
+	/**
+	 * 线上次卡次数--用过一次后
+	 */
+	public static String timecarduse(LocalLib local) {
+		String timecard = "110";
+//		String timecard = "852365";
+		return timecard;
+	}
+	
 	
 
 }

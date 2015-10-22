@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import android.widget.TextView;
+
 import com.baidu.cafe.local.LocalLib;
 import com.baidu.recordreplay.test.lib.MyEntry;
 public class ToPage {
@@ -25,7 +27,7 @@ public class ToPage {
 	 * 操作：首页->点击“我的”
 	 */
 	public static void tomypage(LocalLib local) {
-		local.sleep(2000);
+//		local.sleep(2000);
     	local.clickOnView(MyEntry.mypageentry(local));//点击我的页面
     	local.sleep(2000);
 	}
@@ -68,7 +70,8 @@ public class ToPage {
 	public static void towashcarpage(LocalLib local) {
 		local.waitForActivity("CHomeActivity");
     	local.clickOnView(MyEntry.washcarentry(local));//点击上门洗车
-    	local.sleep(3000);
+//    	local.sleep(3000);
+    	local.waitForText("优惠券");
 	}
 	
 	/**
@@ -82,13 +85,25 @@ public class ToPage {
 	}
 	
 	/**
+	 * 功能：进入标准洗车次卡页
+	 * 操作：首页->进入我的页面->点击标准洗车次卡
+	 */
+	public static void totimecard(LocalLib local) {
+    	ToPage.tomypage(local);
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/tab_my_time_card_layout"));//点击标准洗车次卡
+    	local.sleep(1500);
+	}
+	
+	/**
 	 * 功能：进入我的优惠劵页面
 	 * 操作：首页->进入我的页面->点击优惠劵
 	 */
 	public static void tomycoupon(LocalLib local) {
+		local.waitForActivity("CHomeActivity");
     	ToPage.tomypage(local);
     	local.clickOnView(local.getView("lay_my_coupon"));//点击优惠劵
-    	local.sleep(1500);
+//    	local.sleep(1500);
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/coupons_bg"));
 	}
 	
 	/**
@@ -156,16 +171,17 @@ public class ToPage {
 	
 	/**
 	 * 功能：进入订单页面
-	 * 操作：首页->进入我的页面->点击我的车辆
+	 * 操作：首页->点击订单
 	 */
 	public static void toorderpage(LocalLib local) {
-		local.sleep(2000);
+//		local.sleep(2000);
+		assertTrue("未成功跳转到首页！", local.waitForText("订单"));
+//		local.waitForActivity("CHomeActivity");
     	local.clickOnView(MyEntry.myneedentry(local));//点击订单
-    	local.sleep(1500);
+//    	local.sleep(1500);
+    	TextView date = (TextView)local.getView("txt_date");
+    	local.waitForView(date);
 	}
-	
-	
-	
 	
 	
 
