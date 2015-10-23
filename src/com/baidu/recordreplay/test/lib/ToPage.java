@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baidu.cafe.local.LocalLib;
@@ -37,10 +38,11 @@ public class ToPage {
 	 * 操作：首页->点击header左侧服务城市
 	 */
 	public static void toselectcitypage(LocalLib local) {
-		local.sleep(3000);
+//		local.sleep(3000);
     	local.waitForActivity("CHomeActivity");
+    	local.sleep(500);
     	local.clickOnView(MyEntry.selectservicecityentry(local));//进入选择服务城市页面
-    	local.sleep(2000);
+//    	local.sleep(2000);
 	}
 	
 	/**
@@ -49,8 +51,27 @@ public class ToPage {
 	 */
 	public static void toselectproductpage(LocalLib local) {
 		ToPage.towashcarpage(local);//点击开始洗车
+		local.waitForView(MyEntry.selectproductentry(local));
     	local.clickOnView(MyEntry.selectproductentry(local));//点击标准服务区域
-    	local.sleep(3000);
+//    	local.sleep(3000);
+    	local.waitForText("套餐");
+    	assertTrue("未成功跳转到套餐列表页！", local.waitForText("套餐"));
+	}
+	
+	/**
+	 * 功能：进入套餐详情页
+	 * 操作：首页->点击任务
+	 * 1.7.5，add，进入套餐详情页
+	 */
+	public static void totaskdetailpage(LocalLib local) {
+		local.waitForActivity("CHomeActivity");
+//    	local.clickOnView(MyEntry.productentry(local));//点击套餐 1.7.5
+//    	local.sleep(5000);
+//    	local.clickOnView(local.getView("com.ganji.android.ccar:id/right_container"));
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/left_title"));
+    	local.sleep(1000);
+    	ImageView pic = (ImageView)local.getView("com.ganji.android.ccar:id/iv_promotion_image");
+    	assertTrue("未成功跳转到套餐详情页！", local.waitForView(pic));
 	}
 	
 	/**
@@ -71,7 +92,9 @@ public class ToPage {
 		local.waitForActivity("CHomeActivity");
     	local.clickOnView(MyEntry.washcarentry(local));//点击上门洗车
 //    	local.sleep(3000);
+//    	local.waitForText(ChangL.washcarheadertxt);
     	local.waitForText("优惠券");
+    	local.scrollUp();//拉到最上
 	}
 	
 	/**
@@ -103,7 +126,7 @@ public class ToPage {
     	ToPage.tomypage(local);
     	local.clickOnView(local.getView("lay_my_coupon"));//点击优惠劵
 //    	local.sleep(1500);
-    	local.waitForView(local.getView("com.ganji.android.ccar:id/coupons_bg"));
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/coupons_list_rl"));
 	}
 	
 	/**
@@ -167,6 +190,8 @@ public class ToPage {
     	ToPage.tomypage(local);
     	local.clickOnView(local.getView("lay_favorite_address"));//点击常用地址
     	local.sleep(1500);
+    	local.searchText("添加常用地址,轻松享用一键上门洗车服务");
+    	local.searchText("家");
 	}
 	
 	/**
@@ -175,12 +200,14 @@ public class ToPage {
 	 */
 	public static void toorderpage(LocalLib local) {
 //		local.sleep(2000);
-		assertTrue("未成功跳转到首页！", local.waitForText("订单"));
+		assertTrue("未成功跳转到首页！", local.waitForText("赶集易洗车"));//改成”订单“试试
 //		local.waitForActivity("CHomeActivity");
     	local.clickOnView(MyEntry.myneedentry(local));//点击订单
 //    	local.sleep(1500);
     	TextView date = (TextView)local.getView("txt_date");
     	local.waitForView(date);
+    	local.searchText("月");
+    	local.searchText("日");
 	}
 	
 	

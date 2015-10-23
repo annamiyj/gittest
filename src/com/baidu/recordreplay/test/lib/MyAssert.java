@@ -36,39 +36,49 @@ import com.baidu.recordreplay.test.lib.SetStep;
 
 public class MyAssert {
 	
-	/**
-	 * 文字常量
-	 * 上门洗车页，您的联系方式默认文案
-	 */
-	public static String washcar_nophone_txt(LocalLib local) {
-		String nophonetxt = "您的联系方式";//上门洗车页，您的联系方式默认文案
-		return nophonetxt;
-	}
-	
-	/**
-	 * 文字常量
-	 * 上门洗车页，标准洗车header文案
-	 */
-	public static String washcar_header_txt(LocalLib local) {
-		String washcarheadertxt = "标准洗车";//标准洗车页header文案
-		return washcarheadertxt;
-	}
-	
-	/**
-	 * 文字常量
-	 * 上门洗车--选择服务页，header文案
-	 */
-	public static String seleproduct_header_txt(LocalLib local) {
-		String seleproductheadertxt = "选择服务";//标准洗车页header文案
-		return seleproductheadertxt;
-	}
+//	/**
+//	 * 文字常量 a
+//	 * 上门洗车页，您的联系方式默认文案
+//	 */
+//	public static String washcar_nophone_txt(LocalLib local) {
+//		String nophonetxt = "您的联系方式";//上门洗车页，您的联系方式默认文案
+//		return nophonetxt;
+//	}
+//	
+//	/**
+//	 * 文字常量 a
+//	 * 上门洗车页，标准洗车header文案
+//	 */
+//	public static String washcar_header_txt(LocalLib local) {
+//		String washcarheadertxt = "上门洗车";//一键洗车页header文案
+//		return washcarheadertxt;
+//	}
+//	
+//	/**
+//	 * 文字常量 a
+//	 * 首页，一键下单按钮文案
+//	 */
+//	public static String home_quickorder_txt(LocalLib local) {
+//		String homequickordertxt = "一键下单";//首页一键下单文案
+//		return homequickordertxt;
+//	}
+//	
+//	/**
+//	 * 文字常量 a
+//	 * 上门洗车--选择套餐，header文案
+//	 * 1.7.5，update
+//	 */
+//	public static String seleproduct_header_txt(LocalLib local) {
+//		String seleproductheadertxt = "选择服务";//一键洗车选择套餐header文案
+//		return seleproductheadertxt;
+//	}
 
 	/**
 	 * 获取文字
 	 * header文案区域文字
 	 */
 	public static String getall_header_txt(LocalLib local) {
-		TextView bzxc = (TextView)local.getView("com.ganji.android.ccar:id/center_text");
+		TextView bzxc = (TextView)MyEntry.headertxt(local);
 		String bzxctxt = bzxc.getText().toString();
 		return bzxctxt;
 	}
@@ -124,6 +134,16 @@ public class MyAssert {
 	}
 	
 	/**
+	 * 获取区域文字
+	 * 标准洗车页，内饰价格文字
+	 */
+	public static String getwashcar_interiorprice_txt(LocalLib local) {
+		TextView interiorprice = (TextView)MyEntry.interiortxt(local);
+		String interiorpricetxt = interiorprice.getText().toString();
+		return interiorpricetxt;
+	}
+	
+	/**
 	 * 获取文字
 	 * 标准洗车页，红包区域文字
 	 */
@@ -175,7 +195,7 @@ public class MyAssert {
 	 * 车辆信息页，确定按钮文字
 	 */
 	public static String getsubmit_carinfo_txt(LocalLib local) {
-		String submittxt = MyEntry.actionentry(local).getText().toString();
+		String submittxt = MyEntry.submitbutton(local).getText().toString();
 		return submittxt;
 	}
 	

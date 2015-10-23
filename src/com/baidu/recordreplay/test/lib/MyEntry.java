@@ -3,7 +3,6 @@ package com.baidu.recordreplay.test.lib;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -43,16 +42,26 @@ public class MyEntry {
 	 * 位置：首页header左侧
 	 */
 	public static TextView selectservicecityentry(LocalLib local) {
-		TextView servicecity = (TextView)local.getView("txt_title_left");
+		TextView servicecity = (TextView)local.getView("com.ganji.android.ccar:id/home_city_btn");
 		return servicecity;
 	}
+	
+	/**
+	 * 获取文字
+	 * header文案区域文字
+	 */
+	public static TextView headertxt(LocalLib local) {
+		TextView header = (TextView)local.getView("com.ganji.android.ccar:id/center_text");
+		return header;
+	}
+	
 
 	/**
-	 * 活动入口
-	 * 位置：首页header右侧
+	 * 优惠活动入口
+	 * 位置：首页
 	 */
-	public static TextView actionentry(LocalLib local) {
-		TextView action = (TextView)local.getView("txt_title_right");
+	public static LinearLayout actionentry(LocalLib local) {
+		LinearLayout action = (LinearLayout)local.getView("com.ganji.android.ccar:id/promotions");//1.7.5，update
 		return action;
 	}
 	
@@ -61,34 +70,36 @@ public class MyEntry {
 	 * 位置：首页
 	 */
 	public static LinearLayout washcarentry(LocalLib local) {
-		LinearLayout washcar = (LinearLayout)local.getView("lay_btn1");
+		LinearLayout washcar = (LinearLayout)local.getView("com.ganji.android.ccar:id/quick_order");//1.7.5，update
 		return washcar;
 	}
 
-	/**
-	 * 任务入口
-	 * 位置：首页
-	 */
-	public static RelativeLayout taskentry(LocalLib local) {
-		RelativeLayout task = (RelativeLayout)local.getView("lay_btn2");
-		return task;
-	}
+//	/**
+//	 * 任务入口
+//	 * 位置：首页
+//	 */
+//	public static RelativeLayout taskentry(LocalLib local) {
+////		RelativeLayout task = (RelativeLayout)local.getView("lay_btn2");
+//		RelativeLayout task = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_task_list");//1.7.5
+//		return task;
+//	}
 
-	/**
-	 * 套餐入口
-	 * 位置：首页
-	 */
-	public static LinearLayout productentry(LocalLib local) {
-		LinearLayout product = (LinearLayout)local.getView("lay_btn3");
-		return product;
-	}
+//	/**
+//	 * 套餐入口
+//	 * 位置：首页
+//	 * 1.7.5,delete
+//	 */
+//	public static LinearLayout productentry(LocalLib local) {
+//		LinearLayout product = (LinearLayout)local.getView("lay_btn3");
+//		return product;
+//	}
 
 	/**
 	 * VIP下单入口
 	 * 位置：首页
 	 */
 	public static LinearLayout VIPorderentry(LocalLib local) {
-		LinearLayout VIPorder = (LinearLayout)local.getView("lay_btn4");
+		LinearLayout VIPorder = (LinearLayout)local.getView("com.ganji.android.ccar:id/vip_order");//1.7.5，update
 		return VIPorder;
 	}
 	
@@ -97,7 +108,7 @@ public class MyEntry {
 	 * 位置：首页
 	 */
 	public static LinearLayout serviceintroduceentry(LocalLib local) {
-		LinearLayout serviceintroduce = (LinearLayout)local.getView("lay_btn5");
+		LinearLayout serviceintroduce = (LinearLayout)local.getView("com.ganji.android.ccar:id/service_introduce");//1.7.5,update
 		return serviceintroduce;
 	}
 	
@@ -105,9 +116,27 @@ public class MyEntry {
 	 * 洗车指数入口
 	 * 位置：首页
 	 */
-	public static RelativeLayout washindexentry(LocalLib local) {
-		RelativeLayout washindex = (RelativeLayout)local.getView("lay_btn6");
+	public static LinearLayout washindexentry(LocalLib local) {
+		LinearLayout washindex = (LinearLayout)local.getView("com.ganji.android.ccar:id/weather_details");
 		return washindex;
+	}
+	
+	/**
+	 * 洗车指数天气文字,1.7.5，add
+	 * 位置：首页
+	 */
+	public static TextView weatherdescriptionentry(LocalLib local) {
+		TextView weatherdescription = (TextView)local.getView("com.ganji.android.ccar:id/weather_description");//1.7.5，add
+		return weatherdescription;
+	}
+	
+	/**
+	 * 洗车指数条件文字，1.7.5，add
+	 * 位置：首页
+	 */
+	public static TextView weatherwashcarconditionentry(LocalLib local) {
+		TextView weatherwashcarcondition = (TextView)local.getView("com.ganji.android.ccar:id/weather_wash_car_condition");//1.7.5,add
+		return weatherwashcarcondition;
 	}
 
 	/**
@@ -115,7 +144,7 @@ public class MyEntry {
 	 * 首页底部tab1
 	 */
 	public static RelativeLayout homepageentry(LocalLib local) {
-		RelativeLayout home = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_home");//1.7.0
+		RelativeLayout home = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_home");//1.7.5，update
 		return home;
 	}
 
@@ -124,16 +153,25 @@ public class MyEntry {
 	 * 首页底部tab2
 	 */
 	public static RelativeLayout myneedentry(LocalLib local) {
-		RelativeLayout myneed = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_order_list");//1.7.0
+		RelativeLayout myneed = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_order_list");//1.7.5，update
 		return myneed;
+	}
+	
+	/**
+	 * 任务入口
+	 * 首页底部tab3
+	 */
+	public static RelativeLayout taskentry(LocalLib local) {
+		RelativeLayout task = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_task_list");//1.7.5，update
+		return task;
 	}
 
 	/**
 	 * 我的页面入口
-	 * 首页底部tab3
+	 * 首页底部tab4
 	 */
 	public static RelativeLayout mypageentry(LocalLib local) {
-		RelativeLayout mypage = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_my_page");//1.7.0
+		RelativeLayout mypage = (RelativeLayout)local.getView("com.ganji.android.ccar:id/rl_my_page");//1.7.5，update
 		return mypage;
 	}
 	
@@ -218,6 +256,20 @@ public class MyEntry {
 		TextView interior = (TextView)local.getView("com.ganji.android.ccar:id/txt_interior");
 		return interior;
 	}
+	
+	/**
+	 * 内饰价格+3元文字
+	 * 位置：上门洗车页
+	 */
+	public static TextView interiortxt(LocalLib local) {
+		TextView interiortxt = (TextView)local.getView("com.ganji.android.ccar:id/txt_price");
+		return interiortxt;
+	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * 红包区域
@@ -367,6 +419,15 @@ public class MyEntry {
 	}
 	
 	/**
+	 * 确定按钮
+	 * 位置：上门洗车-进入车辆信息页
+	 */
+	public static TextView submitbutton(LocalLib local) {
+		TextView submit = (TextView)local.getView("com.ganji.android.ccar:id/txt_title_right");
+		return submit;
+	}
+	
+	/**
 	 * 详细位置输入框
 	 * 位置：详细位置描述页
 	 */
@@ -502,34 +563,63 @@ public class MyEntry {
 	 * 点击立即下单后
 	 */
 	public static View canclebutton(LocalLib local) {
-		View canclebutton= local.getView("com.ganji.android.ccar:id/dialog_item_text", 4);
+//		View canclebutton= local.getView("com.ganji.android.ccar:id/dialog_item_text", 4);
+		View canclebutton= local.getText("稍后支付");
 		return canclebutton;
+	}
+	
+	/**
+	 * 余额支付按钮
+	 * 点击立即下单后
+	 */
+	public static TextView balancepaybutton(LocalLib local) {
+		TextView balancepay = (TextView)local.getView("com.ganji.android.ccar:id/item_dialog_custom_tv");
+		return balancepay;
 	}
 
 	/**
 	 * 个人头像
 	 * 我的页面
 	 */
-	public static View profileimg(LocalLib local) {
-		View profileimg = local.getView("com.ganji.android.ccar:id/img_profile");
+	public static ImageView profileimg(LocalLib local) {
+		ImageView profileimg = (ImageView)local.getView("com.ganji.android.ccar:id/img_profile");
 		return profileimg;
 	}
+	
+	/**
+	 * 我的消息入口
+	 * 我的页面
+	 */
+	public static RelativeLayout mymessageentry(LocalLib local) {
+		RelativeLayout mymessage = (RelativeLayout)local.getView("com.ganji.android.ccar:id/lay_message");
+		return mymessage;
+	}
+	
 	
 	/**
 	 * 余额入口
 	 * 我的页面
 	 */
-	public static RelativeLayout balanceentry(LocalLib local) {
-		RelativeLayout balance = (RelativeLayout)local.getView("com.ganji.android.ccar:id/lay_my_balance");
+	public static LinearLayout balanceentry(LocalLib local) {
+		LinearLayout balance = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_my_balance");
 		return balance;
+	}
+	
+	/**
+	 * 次卡入口
+	 * 我的页面
+	 */
+	public static LinearLayout timecardentry(LocalLib local) {
+		LinearLayout timecard = (LinearLayout)local.getView("com.ganji.android.ccar:id/tab_my_time_card_layout");
+		return timecard;
 	}
 	
 	/**
 	 * 优惠劵入口
 	 * 我的页面
 	 */
-	public static RelativeLayout couponentry(LocalLib local) {
-		RelativeLayout couponen = (RelativeLayout)local.getView("com.ganji.android.ccar:id/lay_my_coupon");
+	public static LinearLayout couponentry(LocalLib local) {
+		LinearLayout couponen = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_my_coupon");
 		return couponen;
 	}
 	
@@ -537,8 +627,8 @@ public class MyEntry {
 	 * 红包入口
 	 * 我的页面
 	 */
-	public static RelativeLayout myredpackageentry(LocalLib local) {
-		RelativeLayout myredpackage = (RelativeLayout)local.getView("com.ganji.android.ccar:id/lay_my_red_package");
+	public static LinearLayout myredpackageentry(LocalLib local) {
+		LinearLayout myredpackage = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_my_red_package");
 		return myredpackage;
 	}
 	
@@ -558,6 +648,15 @@ public class MyEntry {
 	public static LinearLayout myinvitecodeentry(LocalLib local) {
 		LinearLayout myinvitecode = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_my_invite_code");
 		return myinvitecode;
+	}
+	
+	/**
+	 * 我的页面扫一扫入口
+	 * 我的页面
+	 */
+	public static LinearLayout qrcodemypageentry(LocalLib local) {
+		LinearLayout qrcodemypage = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_my_qrcode");
+		return qrcodemypage;
 	}
 	
 	/**
@@ -585,15 +684,6 @@ public class MyEntry {
 	public static LinearLayout mycarentry(LocalLib local) {
 		LinearLayout mycar = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_car");
 		return mycar;
-	}
-	
-	/**
-	 * 我的消息入口
-	 * 我的页面
-	 */
-	public static LinearLayout mymessageentry(LocalLib local) {
-		LinearLayout mymessage = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_message");
-		return mymessage;
 	}
 	
 	/**
@@ -754,69 +844,97 @@ public class MyEntry {
 	
 
 
-	//变量
-	/**
-	 * 线上万能手机号1
-	 */
-	public static String phonenum(LocalLib local) {
-		String phonenum = "18501192536";	//online
+//	//变量
+//	/**
+//	 * 线上万能手机号1 a
+//	 */
+//	public static String phonenum(LocalLib local) {
+////		String phonenum = "18501192536";	//online
 //		String phonenum = "14444444444";	//test
-		return phonenum;
-	}	
+//		return phonenum;
+//	}	
+//	
+//	/**
+//	 * 线上万能手机号2，主要 用于测试首次下单一元 a
+//	 */
+//	public static String firstphonenum(LocalLib local) {
+//		String phonenumfirst = "18904041414";	//online
+////		String phonenumfirst = "14444444444";	//test
+//		return phonenumfirst;
+//	}
+//
+//	/**
+//	 * 线上万能手机号1，打星号的 a
+//	 */
+//	public static String phonenumxing(LocalLib local) {
+////		String phonenumfirst = "185****2536";	//online
+//		String phonenumfirst = "1********44";	//test
+//		return phonenumfirst;
+//	}
+//	
+//	/**
+//	 * 线上万能手机号1和2的密码 a
+//	 */
+//	public static String password(LocalLib local) {
+////		String password = "3423";
+//		String password = "752455";
+//		return password;
+//	}
+//	
+//	/**
+//	 * 线上账号余额 a
+//	 */
+//	public static String balance(LocalLib local) {
+////		String balance = "1112";
+//		String balance = "7498.54";
+//		return balance;
+//	}
+//	
+//	/**
+//	 * 线上次卡次数 a
+//	 */
+//	public static String timecard(LocalLib local) {
+////		String timecard = "110";
+//		String timecard = "2322";
+//		return timecard;
+//	}
+//	
+//	/**
+//	 * 线上次卡次数--用过一次后 a
+//	 */
+//	public static String timecarduse(LocalLib local) {
+////		String timecard = "109";
+//		String timecard = "1222";
+//		return timecard;
+//	}
+//	
+//	/**
+//	 * 线上优惠券数量 a
+//	 */
+//	public static String coupons(LocalLib local) {
+////		String coupons = "2";//online
+//		String coupons = "8";//test
+//		return coupons;
+//	}
+//	
+//	/**
+//	 * 线上北京套餐数量 a
+//	 */
+//	public static String productbj(LocalLib local) {
+////		String productbj = "2";
+//		String productbj = "31";
+//		return productbj;
+//	}
+//	
+//	/**
+//	 * 线上开通城市数量 a
+//	 */
+//	public static String citynum(LocalLib local) {
+////		String citynum = "2";
+//		String citynum = "11";
+//		return citynum;
+//	}
 	
-	/**
-	 * 线上万能手机号2，主要 用于测试首次下单一元
-	 */
-	public static String firstphonenum(LocalLib local) {
-		String phonenumfirst = "18904041414";	//online
-//		String phonenumfirst = "14444444444";	//test
-		return phonenumfirst;
-	}
-
-	/**
-	 * 线上万能手机号1和2的密码
-	 */
-	public static String password(LocalLib local) {
-		String password = "3423";
-//		String password = "852365";
-		return password;
-	}
-	
-	/**
-	 * 线上账号余额
-	 */
-	public static String balance(LocalLib local) {
-		String balance = "1112";
-//		String balance = "852365";
-		return balance;
-	}
-	
-	/**
-	 * 线上次卡次数
-	 */
-	public static String timecard(LocalLib local) {
-		String timecard = "123";
-//		String timecard = "852365";
-		return timecard;
-	}
-	
-	/**
-	 * 线上剩余次卡次数
-	 */
-	public static String bjtimecard(LocalLib local) {
-		String bjtimecard = "111";
-//		String timecard = "852365";
-		return bjtimecard;
-	}
-	
-	/**
-	 * 线上次卡次数--用过一次后
-	 */
-	public static String timecarduse(LocalLib local) {
-		String timecard = "110";
-//		String timecard = "852365";
-		return timecard;
-	}
 	
 	
 

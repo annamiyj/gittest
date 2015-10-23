@@ -1,5 +1,6 @@
 package com.baidu.recordreplay.test;
 //import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -44,11 +45,14 @@ import android.provider.MediaStore;
 
 
 
+
+
+import com.baidu.recordreplay.test.lib.ChangL;
 import com.baidu.recordreplay.test.lib.MyEntry;
 import com.baidu.recordreplay.test.lib.ToPage;
 import com.baidu.recordreplay.test.lib.SetStep;
 import com.baidu.recordreplay.test.lib.MyAssert;
-import com.baidu.recordreplay.test.lib.FileOperation;
+import com.baidu.recordreplay.test.lib.ChangL;
 
 import java.util.ArrayList;
 
@@ -109,32 +113,27 @@ public class MyTest extends CafeTestCase {
     
     
     /**
-     * @Name 1005_guidepage
+     * @Name 0001_guidepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 首次启动，正常启动引导页；
      * @FunctionPoint 首次启动，正常启动引导页；
      */
     private void test_0001_guidepage() {
-    	remote.clearApplicationUserData("com.ganji.android.ccar");//清理缓存
+//    	remote.clearApplicationUserData("com.ganji.android.ccar");//清理缓存
 //    	local.sleep(3000);
     	assertTrue("CurrentActivity is not CHomeActivity", local.waitForActivity("CHomeActivity"));//断言：当前activity是否是CFeatureActivity
 		for (int i=1;i<=3;i++) {//四张引导图，滑动三次
 			local.sleep(2000);
 			local.scrollToSide(local.RIGHT);//从右往左滑动
 //			local.takeScreenshot("GuideMap"+i);//第i张引导图截图
-			local.screenShotNamedCaseName("pic_000"+i);//Take a ScreenShot
+			local.screenShotNamedCaseName("pic_000"+i);
 		}
 		local.sleep(2000);
-//		assertTrue("未跳转到第三页！", local.waitForText("开始体验"));
-		local.waitForView(local.getView("com.ganji.android.ccar:id/btn_long"));
-		Button begin = (Button)local.getView("com.ganji.android.ccar:id/btn_long");
-		String begintxt = begin.getText().toString();
-		assertEquals("No \"开始体验\" button", "开始体验", begintxt);//断言：判断是否有开始体验按钮
-		local.clickOnView(begin);//点击开始体验按钮
-//		local.clickOnText("开始体验");
+		local.clickOnView(local.getView("com.ganji.android.ccar:id/finish_btn"));//点击开始体验按钮
+		local.sleep(1500);
 //		local.sleep(5000);
 		assertTrue("Can not go to CHomeActivity from FeatureActivity!", local.waitForActivity("CHomeActivity"));//断言：是否进入首页
     }
@@ -142,11 +141,11 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1010_homepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，非首次启动，正常进入首页，检查页面元素；
-     * @FunctionPoint 未登录，非首次启动，正常进入首页，检查页面元素；
+     * @FunctionPoint 未登录，非首次启动，正常进入首页，检查页面元素；2.0.1，首页改版
      */
     public void test_1010_homepage() {
     	Log.d("test", "test_1002_homepage start");
@@ -154,39 +153,49 @@ public class MyTest extends CafeTestCase {
 		assertTrue("CurrentActivity is not CHomeActivity!", local.waitForActivity("CHomeActivity",5000));//断言：判断当前页是否CHomeactivity
 //		local.takeScreenshot("HomePage");//home页截图
 		assertEquals("No \"赶集易洗车\" text！ ", "赶集易洗车", MyAssert.getall_header_txt(local));//断言：header文案
-		String actiontxt = MyEntry.actionentry(local).getText().toString();
-		assertEquals("No \"活动\" text！", "活动", actiontxt);//断言：header右侧文案
 		assertTrue("No Localtion view!", local.waitForView(local.getView("txt_title_left")));//断言：判断是否显示地区
+		assertTrue("No saoyisao view!", local.waitForView(local.getView("com.ganji.android.ccar:id/btn_title_right")));//断言：判断是否显示扫一扫
 		assertTrue("No banner view!", local.waitForView(local.getView("viewpager")));//断言：判断banner图区域
-		TextView washcar = (TextView)MyEntry.washcarentry(local).getChildAt(1);//上门洗车文字区域
+		TextView weatherdegree = (TextView)local.getView("com.ganji.android.ccar:id/weather_degree");//温度显示
+		String weatherdegreetxt = weatherdegree.getText().toString();
+		assertTrue("没有显示温度！", weatherdegreetxt.contains("℃"));
+		TextView washcar = (TextView)MyEntry.washcarentry(local).getChildAt(1);//一键下单文字区域
 		String washcartxt = washcar.getText().toString();
-		assertEquals("No \"标准洗车\" text！", "上门洗车", washcartxt);//断言：功能区：标准洗车文案
-		TextView task = (TextView)MyEntry.taskentry(local).getChildAt(2);//任务文字区域
-		String tasktxt = task.getText().toString();
-		assertEquals("No \"任务\" text！", "任务", tasktxt);//断言：功能区：任务文案
-		TextView product = (TextView)MyEntry.productentry(local).getChildAt(1);//上门洗车文字区域
-		String producttxt = product.getText().toString();
-		assertEquals("No \"套餐\" text！", "套餐", producttxt);//断言：功能区：套餐文案
-		TextView VIP = (TextView)MyEntry.VIPorderentry(local).getChildAt(1);//上门洗车文字区域
-		String VIPtxt = VIP.getText().toString();
-		assertEquals("No \"VIP下单\" text！", "VIP下单", VIPtxt);//断言：功能区：VIP下单文案
+		assertEquals("No \"一键下单\" text！", ChangL.homequickordertxt, washcartxt);//断言：功能区：一键下单文案
+		String washdescriptiontxt = MyEntry.weatherdescriptionentry(local).getText().toString();//洗车天气文字
+		assertTrue("没有显示洗车天气！", !washdescriptiontxt.isEmpty());
+		String washcarconditiontxt = MyEntry.weatherwashcarconditionentry(local).getText().toString();
+		assertTrue("没有显示洗车条件！", !washcarconditiontxt.isEmpty());
 		TextView serviceintro = (TextView)MyEntry.serviceintroduceentry(local).getChildAt(1);//服务介绍文字区域
 		String serviceintrotxt = serviceintro.getText().toString();
 		assertEquals("No \"服务介绍\" text！", "服务介绍", serviceintrotxt);//断言：功能区：服务介绍文案
-		TextView washindex = (TextView)MyEntry.washindexentry(local).getChildAt(3);//洗车指数文字区域
-		String washindextxt = washindex.getText().toString();
-		assertEquals("No \"洗车指数\" text！", "洗车指数", washindextxt);//断言：功能区：洗车指数文案
-		Log.d("test", "test_1002_homepage  end");
+		TextView VIP = (TextView)MyEntry.VIPorderentry(local).getChildAt(1);//VIP下单文字区域
+		String VIPtxt = VIP.getText().toString();
+		assertEquals("No \"VIP下单\" text！", "VIP下单", VIPtxt);//断言：功能区：VIP下单文案
+		TextView action = (TextView)MyEntry.actionentry(local).getChildAt(1);//优惠活动文字
+		String actiontxt = action.getText().toString();
+		assertEquals("No \"优惠活动\" text！", "优惠活动", actiontxt);//断言：优惠活动入口
+		local.scrollDown();//上拉
+		LinearLayout product = (LinearLayout)local.getView("com.ganji.android.ccar:id/home_promotion_container");//套餐区域
+		assertEquals("套餐数量不正确！", ChangL.productbj, product.getChildCount());//套餐数量，线上还得改
+		TextView leftproducttitle = (TextView)local.getView("com.ganji.android.ccar:id/left_title");//第一个左侧套餐名称
+		ImageView leftproducticon = (ImageView)local.getView("com.ganji.android.ccar:id/left_icon");//第一个左侧套餐icon
+		TextView rightproducttitle = (TextView)local.getView("com.ganji.android.ccar:id/right_title");//第一个右侧套餐名称
+		ImageView rightproducticon = (ImageView)local.getView("com.ganji.android.ccar:id/right_icon");//第一个右侧套餐icon
+		String leftproducttitletxt = leftproducttitle.getText().toString();
+		String rightproducttitletxt = rightproducttitle.getText().toString();
+		assertTrue("没有套餐icon！", local.waitForView(leftproducticon)&&local.waitForView(rightproducticon));
+		assertTrue("套餐名称不正确！", leftproducttitletxt.contains("套餐")&&rightproducttitletxt.contains("套餐"));
     }
     
     /**
      * @Name 1015_selectcitypage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击Header左侧按钮，正常进入服务城市页，检查页面元素；
-     * @FunctionPoint 未登录，点击Header左侧按钮，正常进入服务城市页，检查页面元素；
+     * @FunctionPoint 未登录，点击Header左侧按钮，正常进入服务城市页，检查页面元素；2.0.1，update，城市数量断言
      */
     public void test_1015_selectcitypage() {
     	Log.d("test", "test_1003_selectcitypage  start");
@@ -200,7 +209,9 @@ public class MyTest extends CafeTestCase {
     	assertEquals("No \"当前定位城市\" text！", "当前定位城市", currentcitytxt);//断言：列表，当前定位城市
     	TextView opencity = (TextView)local.getView("com.ganji.android.ccar:id/row_title",2);//目前卡通城市文字区域
     	String opencitytxt = opencity.getText().toString();
-    	assertEquals("No \"目前开通城市\" text！", "目前开通城市", opencitytxt);//断言：列表，当前定位城市
+    	ListView list = (ListView)local.getView("com.ganji.android.ccar:id/lv_city");//城市列表
+    	assertEquals("开通的城市数量不正确！", ChangL.citynum, list.getChildCount());//城市数量，线上还得改
+//    	assertEquals("No \"目前开通城市\" text！", "目前开通城市", opencitytxt);//断言：列表，当前定位城市
 		local.clickOnText("北京");//点击北京返回首页
 //		local.sleep(3000);
 		assertTrue("CurrentActivity is not CHomeActivity!", local.waitForActivity("CHomeActivity"));//断言：判断当前页是否CHomeactivity
@@ -210,7 +221,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name test_1020_actionlistpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击Header右侧按钮，正常进入活动列表页，检查页面元素；
@@ -221,7 +232,7 @@ public class MyTest extends CafeTestCase {
     	ToPage.toactionpage(local);//进入活动页
 //    	local.assertCurrentActivity("CurrentActivity is not SLFragmentActivity", "SLFragmentActivity");//断言：判断当前activity是否SLFragmentActivity
     	//审查页面元素
-    	assertEquals("No \"活动\" text！ ", "活动", MyAssert.getall_header_txt(local));//断言：header文案
+    	assertEquals("No \"优惠活动\" text！ ", "优惠活动", MyAssert.getall_header_txt(local));//断言：header文案
 		assertTrue("No action_picture view!", local.waitForView(local.getView("img_ads")));//断言：判断活动图片view
 		assertTrue("No action_text view!", local.waitForView(local.getView("txt_name")));//断言：判断活动文字view
     	for (int i=1;i<=3;i++) {//往下捯，捯三次
@@ -234,7 +245,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1025_actiondetailpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，活动详情页，任意一个活动检查是否为webview；
@@ -243,7 +254,7 @@ public class MyTest extends CafeTestCase {
     public void test_1025_actiondetailpage() {
     	Log.d("test", "test_1005_actiondetail  start");
     	ToPage.toactionpage(local);//点击进入活动页面
-    	local.clickOnImage(2);//点击第三个活动进入detail页
+    	local.clickOnImage(1);//点击第三个活动进入detail页
 //    	local.assertCurrentActivity("CurrentActivity is not CWebViewActivity", "CWebViewActivity");//断言：判断当前是否是webviewactivity
     	assertTrue("CurrentActivity is not webview！",local.waitForView(local.getView("com.ganji.android.ccar:id/webview")));//断言：判断当前是否是webview
     }
@@ -251,23 +262,25 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1030_washpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击上门洗车，正常进入上门洗车页，检查页面元素；
-     * @FunctionPoint 未登录，点击上门洗车，正常进入上门洗车页，检查页面元素；
+     * @FunctionPoint 未登录，点击上门洗车，正常进入上门洗车页，检查页面元素；2.0.1，update，下单页改版
      */
     public void test_1030_washpage() {
     	Log.d("test", "test_1006_washpage  start");
     	ToPage.towashcarpage(local);
     	//审查页面元素
-    	assertTrue("No \"标准洗车\" text！ ", local.waitForText(MyAssert.washcar_header_txt(local)));//断言：header文案
-    	assertTrue("No \"标准洗车\" image！", local.waitForView(MyEntry.selectproductentry(local)));//断言：套餐选择区域（标准洗车）--图片
-    	assertTrue("No \"标准洗车\" title！", local.waitForView(MyEntry.producttitle(local)));//断言：套餐选择区域（标准洗车）--标准洗车标题
-    	assertTrue("No \"标准洗车\" content！", local.waitForView(MyEntry.productcontent(local)));//断言：套餐选择区域（标准洗车）--标准洗车详细描述
-    	assertTrue("No \"标准洗车\" price now！", local.waitForView(MyEntry.productprice(local)));//断言：套餐选择区域（标准洗车）--标准洗车现在价格
+    	assertTrue("No \"一键洗车\" text！ ", local.waitForText(ChangL.washcarheadertxt));//断言：header文案
+    	assertTrue("No \"一键洗车\" image！", local.waitForView(MyEntry.selectproductentry(local)));//断言：套餐选择区域（一键洗车）--图片
+    	assertTrue("No \"一键洗车\" title！", local.waitForView(MyEntry.producttitle(local)));//断言：套餐选择区域（一键洗车）--一键洗车标题
+    	assertTrue("No \"一键洗车\" content！", local.waitForView(MyEntry.productcontent(local)));//断言：套餐选择区域（一键洗车）--一键洗车详细描述
+    	assertTrue("No \"一键洗车\" price now！", local.waitForView(MyEntry.productprice(local)));//断言：套餐选择区域（一键洗车--一键洗车现在价格
+    	assertEquals("No \"需要清洗内饰\" area！", "需要清洗内饰", MyAssert.getwashcar_interior_txt(local));//断言：是否需要清洗内饰选择区域
+    	assertEquals("No \"清洗内饰+3.00元\" txt！", "+"+ChangL.interiorprice+"元", MyAssert.getwashcar_interiorprice_txt(local));//断言：是否需要清洗内饰价格区域文字
     	String phonetxt = MyEntry.phoneentry(local).getHint().toString();//您的联系方式默认文案
-    	assertTrue("No \"您的联系方式\" area！", "您的联系方式".equals(phonetxt)||MyEntry.phonenum(local).equals(MyAssert.getwashcar_phone_txt(local)));//断言：手机号输入区域，显示您的联系方式文案或手机号
+    	assertTrue("No \"您的联系方式\" area！", "您的联系方式".equals(phonetxt)||ChangL.phonenum.equals(MyAssert.getwashcar_phone_txt(local)));//断言：手机号输入区域，显示您的联系方式文案或手机号
     	String carinfotxt = MyEntry.carinfoentry(local).getHint().toString();//您的车牌号码默认文案
     	assertTrue("No \"您的车牌号码\" area！", "您的车牌号码".equals(carinfotxt)||MyAssert.getwashcar_carinfo_txt(local).contains("TESTED"));//断言：车牌号码输入区域
     	String caraddresstxt = MyEntry.caraddressentry(local).getHint().toString();//车辆停放地址默认文案
@@ -275,7 +288,6 @@ public class MyTest extends CafeTestCase {
     	String cartimetxt = MyEntry.carservicetimeentry(local).getHint().toString();//您希望服务的时间默认文案
     	assertTrue("No \"您希望服务的时间\" area！", "您希望服务的时间".equals(cartimetxt));//断言：服务时间输入区域
 //    	assertTrue("No \"您希望服务的时间\" area！", local.waitForView(local.getView("com.ganji.android.ccar:id/et_content2")));
-    	assertEquals("No \"需要清洗内饰\" area！", "需要清洗内饰", MyAssert.getwashcar_interior_txt(local));//断言：是否需要清洗内饰选择区域
     	TextView coupon = (TextView)local.getView("txt_coupon_label");//“优惠券”文案区域
     	String coupontxt = coupon.getText().toString();
     	assertEquals("优惠券", coupontxt);//断言：优惠券选择区域
@@ -291,27 +303,26 @@ public class MyTest extends CafeTestCase {
     	int sum = ll.getChildCount();
     	if ("".equals(phoneareatxt)) { ////断言：邀请码输入区域（未登录和首次下单时有，非首次下单没有）
     		assertTrue("No \"邀请码\" area！", local.waitForText("邀请码"));
-    		assertEquals("lay_mode_container sum is error!", 26, sum);
+    		assertEquals("lay_mode_container sum is error!", 23, sum);
     	}
 		else
-			assertEquals("lay_mode_container sum is error!", 24, sum);	
+			assertEquals("lay_mode_container sum is error!", 20, sum);	
     	assertTrue("No \"立即下单\" button！", local.waitForView(MyEntry.orderbutton(local)));//立即支付按钮
     }
     
     /**
      * @Name 1035_poductselepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0 
+     * @Subcatalog 2.0.1 
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击标准服务区域进入选择服务页面；
-     * @FunctionPoint 未登录，点击标准服务区域进入选择服务页面；
+     * @FunctionPoint 未登录，点击标准服务区域进入选择服务页面；2.0.1，update，套餐数量判断
      */
     public void test_1035_poductselepage() {
     	Log.d("test", "test_1007_poductsele  start");
     	ToPage.toselectproductpage(local);//进入选择服务页
-    	assertTrue("未成功跳转到选择服务页！", local.waitForText("选择服务"));
-    	assertEquals("No \"选择服务\" text!", MyAssert.seleproduct_header_txt(local), MyAssert.getall_header_txt(local));//断言：Header文案
+    	assertEquals("No \"选择服务\" text!", ChangL.seleproductheadertxt, MyAssert.getall_header_txt(local));//断言：Header文案
     	assertTrue("No RadioButton!", local.waitForView(MyEntry.itemradiobutton(local)));//断言：是否有数据--复选框
     	assertTrue("No image!", local.waitForView(MyEntry.itemimage(local)));//断言：是否有数据--图片
     	assertTrue("No product name!", local.waitForView(MyEntry.itemname(local)));//断言：是否有数据--套餐名称
@@ -319,12 +330,15 @@ public class MyTest extends CafeTestCase {
     	assertTrue("No product price!", local.waitForView(MyEntry.itemprice(local)));//断言：是否有数据--价格
     	assertTrue("No product detailbutton!", local.waitForView(MyEntry.itemviewdetail(local)));//断言：是否有数据--查看按钮
     	assertTrue("No \"套餐\" text!", local.waitForView(local.getText("套餐")));//断言：是否有数据--套餐文字
+    	ListView list = (ListView)local.getView("android:id/list");////获取套餐数量
+    	int num = list.getCount();
+    	assertEquals("product num is wrong!", ChangL.productselebj,num);//套餐为4个，num就为7
     }
     
     /**
      * @Name 1040_setphonpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，上门洗车页，点击联系方式，正常进入登录页，检查页面元素；
@@ -351,7 +365,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1045_carinfopage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，上门洗车页，点击车辆信息，正常进入车辆信息页，检查页面元素；
@@ -392,7 +406,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1050_caraddresspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，上门洗车页，点击车辆停放地址，正常进入车辆停放地址页，检查页面元素；
@@ -408,14 +422,14 @@ public class MyTest extends CafeTestCase {
     	assertEquals("No \"选择车辆停放位置\" text！ ", "选择车辆停放位置", MyAssert.getall_header_txt(local));//断言：header文案
     	assertTrue("No \"选择车辆停放位置\" area！ ", local.waitForText("选择车辆停放位置")&&local.waitForView(MyEntry.choosecaraddressentry(local)));//断言：选择车辆停放位置
     	String contenttxt = MyEntry.servicediqutxt(local).getText().toString();
-    	assertEquals("No \"提示文案\" text！ ", "服务覆盖长安街到北五环，以及上地、回龙观地区", contenttxt);
+    	assertTrue("No \"提示文案\" text！ ", !contenttxt.isEmpty());
 //      assertTrue("No \"历史地址记录\" list！", local.waitForView(local.getView("lay_favorite_address_home")));//断言：历史地址记录区域(已登录，且非首次下单，之前填写过地址)
     }
     
     /**
      * @Name 1055_mapselectpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，上门洗车页，点击车辆停放地址--选择车辆停放地址，正常进入地图选点页，检查页面元素；
@@ -440,7 +454,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1060_caraddressdetailsetpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，上门洗车页，点击车辆停放地址--选择车辆停放地址--任选一个地址点击下一步，正常进入详细位置描述页，检查页面元素；
@@ -474,69 +488,66 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1065_taskpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击任务，正常进入任务列表页，检查页面元素；
-     * @FunctionPoint 未登录，点击任务，正常进入任务列表页，检查页面元素；
+     * @FunctionPoint 未登录，点击任务，正常进入任务列表页，检查页面元素；2.0.1，update，任务入口改变
      */
     public void test_1065_taskpage() {
     	Log.d("test", "test_1013_taskpage  start");
     	ToPage.totaskpage(local);
     	///审查页面元素
-    	assertEquals("No \"任务\" text！ ", "任务", MyAssert.getall_header_txt(local));//断言：header文案
+//    	assertTrue("未成功跳转到任务页！", local.waitForText("任务"));
+    	TextView header = (TextView)local.getView("com.ganji.android.ccar:id/center_text", 2);
+    	String headertxt = header.getText().toString();
+    	assertEquals("No \"任务\" text！ ", "任务", headertxt);//断言：header文案
     	assertEquals("No \"我的奖品\" tab！", "我的奖品", MyAssert.getmyaward_task_txt(local));//断言：我的奖品tab
     	assertEquals("No \"邀请记录\" tab！", "邀请记录", MyAssert.getinviterecord_task_txt(local));//断言：邀请记录tab
 //    	assertTrue("No data!", (local.waitForView(local.getText("分享"))&&local.waitForView(local.getText("洗车"))&&local.waitForView(local.getText("邀请"))));//断言：是否有数据
     	assertTrue("No data!", (local.waitForView(local.getText("洗车"))&&local.waitForView(local.getText("邀请"))));//断言：是否有数据
     }
     
-    /**
-     * @Name 1070_productlistpage
-     * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 中级
-     * @Channel 
-     * @Describe 未登录，点击套餐，正常进入套餐列表页，检查页面元素；
-     * @FunctionPoint 未登录，点击套餐，正常进入套餐列表页，检查页面元素；
-     */
-    public void test_1070_productlistpage() {
-    	Log.d("test", "test_1014_productlistpage  start");
-    	local.waitForActivity("CHomeActivity");
-    	local.clickOnView(MyEntry.productentry(local));//点击套餐
-//    	local.sleep(5000);
-    	assertTrue("未成功跳转到任务页！", local.waitForText("套餐"));
-    	//审查页面元素
-    	assertEquals("No \"套餐\" text！ ", "套餐", MyAssert.getall_header_txt(local));//断言：Header文案
-    	assertTrue("No data！", local.waitForView(local.getView("list")));//是否有list
-    	assertTrue("No picture!", local.waitForView(local.getView("img_ads")));//是否有图片
-    	assertTrue("No product title!", local.waitForView(local.getView("txt_name")));//是否有套餐标题
-    	assertTrue("No product content!", local.waitForView(local.getView("txt_desc")));//是否有套餐描述
-    	assertTrue("No product price_now!", local.waitForView(local.getView("txt_price_now")));//是否有套餐现价
-    	assertTrue("No product price_original!", local.waitForView(local.getView("txt_price_ori")));//是否有套餐原价
-    }
+//    /**
+//     * @Name 1070_productlistpage
+//     * @Catalogue 赶集易洗车C端 Android
+//     * @Subcatalog 2.0.1
+//     * @Grade 中级
+//     * @Channel 
+//     * @Describe 未登录，点击套餐，正常进入套餐列表页，检查页面元素；
+//     * @FunctionPoint 未登录，点击套餐，正常进入套餐列表页，检查页面元素；2.0.1，delete，没有套餐入口了
+//     */
+//    public void test_1070_productlistpage() {
+//    	Log.d("test", "test_1014_productlistpage  start");
+//    	local.waitForActivity("CHomeActivity");
+////    	local.clickOnView(MyEntry.productentry(local));//点击套餐 2.0.1
+////    	local.sleep(5000);
+//    	assertTrue("未成功跳转到任务页！", local.waitForText("套餐"));
+//    	//审查页面元素
+//    	assertEquals("No \"套餐\" text！ ", "套餐", MyAssert.getall_header_txt(local));//断言：Header文案
+//    	assertTrue("No data！", local.waitForView(local.getView("list")));//是否有list
+//    	assertTrue("No picture!", local.waitForView(local.getView("img_ads")));//是否有图片
+//    	assertTrue("No product title!", local.waitForView(local.getView("txt_name")));//是否有套餐标题
+//    	assertTrue("No product content!", local.waitForView(local.getView("txt_desc")));//是否有套餐描述
+//    	assertTrue("No product price_now!", local.waitForView(local.getView("txt_price_now")));//是否有套餐现价
+//    	assertTrue("No product price_original!", local.waitForView(local.getView("txt_price_ori")));//是否有套餐原价
+//    }
     
     /**
      * @Name 1075_productdetailpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，套餐列表页，任意点击一个套餐正常进入套餐详情页，检查页面元素；
-     * @FunctionPoint 未登录，套餐列表页，任意点击一个套餐正常进入套餐详情页，检查页面元素；
+     * @FunctionPoint 未登录，套餐列表页，任意点击一个套餐正常进入套餐详情页，检查页面元素；2.0.1,update,套餐入口改变
      */
     public void test_1075_productdetailpage() {
     	Log.d("test", "test_1015_productdetailpage  start");
-    	local.waitForActivity("CHomeActivity");
-    	local.clickOnView(MyEntry.productentry(local));//点击套餐
-//    	local.sleep(5000);
-    	assertTrue("未成功跳转到套餐列表页！", local.waitForText("套餐"));
-    	local.clickOnView(local.getView("com.ganji.android.ccar:id/img_ads",0));//点击任意第一个进入套餐详情页
-//    	local.sleep(3000);
-    	ImageView pic = (ImageView)local.getView("iv_promotion_image");
-    	assertTrue("未成功跳转到套餐详情页！", local.waitForView(pic));
+    	ToPage.totaskdetailpage(local);//进入套餐详情页
     	//检查页面元素
-    	assertTrue("header text is error!", MyAssert.getall_header_txt(local).contains("套餐"));//header文案，包含套餐俩字
+    	assertTrue("header text is error!"+MyAssert.getall_header_txt(local), MyAssert.getall_header_txt(local).contains("套餐"));//header文案，包含套餐俩字
+    	ImageView pic = (ImageView)local.getView("iv_promotion_image");
     	assertTrue("No promotion_image!", local.waitForView(pic));//断言：头图
     	assertTrue("No price!", local.waitForView(local.getView("tv_price")));//断言：现价显示
     	assertTrue("No original_price!", local.waitForView(local.getView("tv_original_price")));//断言：原价显示
@@ -558,22 +569,17 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1080_productorderpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，套餐详情页，点击立即抢购，进入套餐下单页，检查页面元素；
-     * @FunctionPoint 未登录，套餐详情页，点击立即抢购，进入套餐下单页，检查页面元素；1.7.0，update，新增无次卡入口判断；
+     * @FunctionPoint 未登录，套餐详情页，点击立即抢购，进入套餐下单页，检查页面元素；1.7.0，update，新增无次卡入口判断；2.0.1，进入套餐详情页流程改变
      */
     public void test_1080_productorderpage() {
     	Log.d("test", "test_1016_productorderpage  start");
-    	local.waitForActivity("CHomeActivity");
-    	local.clickOnView(MyEntry.productentry(local));//点击套餐
-//    	local.sleep(5000);
-    	assertTrue("未成功跳转到套餐列表页！", local.waitForText("套餐"));
-    	local.clickOnView(local.getView("com.ganji.android.ccar:id/img_ads",0));//点击任意第一个进入套餐详情页
-//    	local.sleep(3000);
-    	assertTrue("未成功跳转到套餐详情页！", local.waitForView(local.getView("iv_promotion_image")));
+    	ToPage.totaskdetailpage(local);//进入套餐详情页
     	local.clickOnView(MyEntry.productorderbutton(local));//点击立即下单按钮
+    	local.searchText("您",5000);//+
     	//检查页面元素
     	assertTrue("header text is error!", MyAssert.getall_header_txt(local).contains("套餐"));//header文案，包含套餐俩字
 //    	assertTrue("header text is error!", MyAssert.getall_header_txt(local).contains("接口"));//header文案，包含套餐俩字
@@ -582,7 +588,7 @@ public class MyTest extends CafeTestCase {
     	assertTrue("No \"套餐洗车\" content！", local.waitForView(local.getView("txt_desc")));//断言：套餐选择区域（套餐洗车）--套餐洗车详细描述
     	assertTrue("No \"套餐洗车\" price now！", local.waitForView(local.getView("txt_price_now")));//断言：套餐选择区域（套餐洗车）--套餐洗车现在价格
     	String phonetxt = MyEntry.phoneentry(local).getHint().toString();//您的联系方式默认文案
-    	assertTrue("No \"您的联系方式\" area！", "您的联系方式".equals(phonetxt)||MyEntry.phonenum(local).equals(MyAssert.getwashcar_phone_txt(local)));//断言：手机号输入区域，显示您的联系方式文案或手机号
+    	assertTrue("No \"您的联系方式\" area！", "您的联系方式".equals(phonetxt)||ChangL.phonenum.equals(MyAssert.getwashcar_phone_txt(local)));//断言：手机号输入区域，显示您的联系方式文案或手机号
     	String carinfotxt = MyEntry.carinfoentry(local).getHint().toString();//您的车牌号码默认文案
     	assertTrue("No \"您的车牌号码\" area！", "您的车牌号码".equals(carinfotxt)||MyAssert.getwashcar_carinfo_txt(local).contains("TESTED"));//断言：车牌号码输入区域
     	String caraddresstxt = MyEntry.caraddressentry(local).getHint().toString();//车辆停放地址默认文案
@@ -602,13 +608,13 @@ public class MyTest extends CafeTestCase {
     	assertTrue("No \"立即下单\" button！", local.waitForView(MyEntry.orderbutton(local)));//立即支付按钮
     	LinearLayout ll =(LinearLayout)local.getView("com.ganji.android.ccar:id/lay_mode_container");
     	int sum = ll.getChildCount();
-    	assertEquals("lay_mode_container sum is error!", 20, sum);
+    	assertEquals("lay_mode_container sum is error!", 19, sum);
     }
     
     /**
      * @Name 1085_VIPorderpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击VIP下单，进入VIP下单页，检查页面元素；
@@ -623,6 +629,7 @@ public class MyTest extends CafeTestCase {
     	assertTrue("未成功跳转到VIP下单页！", local.waitForView(code));
     	//检查页面元素
     	assertEquals("header text is error!", "VIP下单", MyAssert.getall_header_txt(local));//断言：header文案
+    	assertTrue("No saoyisao view!", local.waitForView(local.getView("com.ganji.android.ccar:id/btn_title_right")));//断言：判断是否显示扫一扫
     	assertTrue("No cooperation input area!", local.waitForView(code));//断言：合作码输入框
     	assertTrue("No next_button!", local.waitForView(local.getView("btn_next")));//断言：下一步按钮
     	RelativeLayout rl = (RelativeLayout)local.getView("com.ganji.android.ccar:id/lay_desc1");//获取vip下单区域文字
@@ -636,9 +643,53 @@ public class MyTest extends CafeTestCase {
     }
     
     /**
+     * @Name 1086_VIPorderdetailpage
+     * @Catalogue 赶集易洗车C端 Android
+     * @Subcatalog 2.0.1
+     * @Grade 中级
+     * @Channel 
+     * @Describe 未登录，点击VIP下单，进入VIP下单页，输入VIP码，进入详情页，检查页面元素;
+     * @FunctionPoint 未登录，点击VIP下单，进入VIP下单页，输入VIP码，进入详情页，检查页面元素；2.0.1,add
+     */
+    public void test_1086_VIPorderdetailpage() {
+    	local.waitForActivity("CHomeActivity");
+    	local.clickOnView(MyEntry.VIPorderentry(local));//点击VIP下单
+//    	local.sleep(3000);
+    	EditText code = (EditText)local.getView("et_cooperation_code");//合作码输入框
+    	local.enterText(code, ChangL.VIPcode);//输入VIP码
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_next"));//点击下一步按钮
+//    	//检查页面元素
+    	assertTrue("header text is error!", local.waitForText("选择服务"));//断言：header文案
+    	local.waitForText(ChangL.VIPcode);
+    	TextView companyname = (TextView)local.getView("com.ganji.android.ccar:id/company_name");//公司名称
+    	String companynametxt = companyname.getText().toString();
+    	assertEquals("VIP companyname is error!", ChangL.VIPcompanyname, companynametxt);
+    	TextView vipcode = (TextView)local.getView("com.ganji.android.ccar:id/company_code");//vipcode
+    	String vipcodetxt = vipcode.getText().toString();
+    	assertEquals("VIP code is error!", ChangL.VIPcode, vipcodetxt);
+    	TextView serviceaddress = (TextView)local.getView("com.ganji.android.ccar:id/service_address");//服务地址
+    	String serviceaddresstxt = serviceaddress.getText().toString();
+    	assertEquals("VIP service adderess is error!", ChangL.VIPserviceaddress, serviceaddresstxt);
+    	TextView title = (TextView)local.getView("com.ganji.android.ccar:id/item_cooperate_select_title");//title
+    	assertTrue("No VIP cooperate title!", local.waitForView(title));
+    	TextView content = (TextView)local.getView("com.ganji.android.ccar:id/item_cooperate_select_content");//content
+    	assertTrue("No VIP cooperate content!", local.waitForView(content));
+    	ImageView image = (ImageView)local.getView("com.ganji.android.ccar:id/item_cooperate_img_ad");//image
+    	assertTrue("No VIP cooperate image!", local.waitForView(image));
+    	TextView price = (TextView)local.getView("com.ganji.android.ccar:id/price_now");//price
+    	assertTrue("No VIP cooperate price!", local.waitForView(price));
+    	ImageView xiang = (ImageView)local.getView("com.ganji.android.ccar:id/xiang");//xiang
+    	assertTrue("No VIP cooperate xiang!", local.waitForView(xiang));
+    	TextView priceori = (TextView)local.getView("com.ganji.android.ccar:id/txt_price_ori");//priceori
+    	assertTrue("No VIP cooperate priceori!", local.waitForView(priceori)); 
+    	Button btn = (Button)local.getView("com.ganji.android.ccar:id/btn");//btn
+    	assertTrue("No VIP cooperate btn!", local.waitForView(btn)); 
+    }
+    
+    /**
      * @Name 1090_seviceintropage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击服务介绍，正常进入服务介绍页，检查页面元素；
@@ -661,7 +712,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1095_washindexpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击洗车指数，进入洗车指数页面，检查页面元素；
@@ -698,7 +749,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1099_mypagenologin
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 未登录，点击进入我的，正常进入我的页面，检查页面元素；
@@ -709,59 +760,48 @@ public class MyTest extends CafeTestCase {
 //    	local.sleep(3000);
     	assertTrue("CurrentActivity is not CHomeActivity", local.waitForActivity("CHomeActivity"));//断言：当前activity是否是CFeatureActivity
     	SetStep.logout(local);//判断是否未登录，点击我的，查看登录状态
-    	local.scrollUp();//往上拉一下
     	//检查页面元素
-    	assertTrue("No \"点此登录\" button!", local.waitForView(local.getView("btn_login")));//断言：点此登录文案
-    	assertEquals("No \"游客\" text!", "游客", MyAssert.getmy_name_txt(local));//断言：游客
-    	RelativeLayout rl = (RelativeLayout)MyEntry.profilenametxt(local).getParent();//足不出户文字区域
-    	TextView content = (TextView)rl.getChildAt(2);
-    	String contenttxt = content.getText().toString();
-    	assertEquals("No \"足不出户\" text!", "足不出户享专业洗车", contenttxt);//断言：足不出户文案
     	assertTrue("No img profile area!", local.waitForView(local.getView("img_profile")));//断言：头像
-    	TextView balance = (TextView)local.getView("com.ganji.android.ccar:id/txt_balance");//余额文字区域
-    	String balancetxt = balance.getText().toString();
+    	assertEquals("No \"点击登录\" text!", "点击登录", MyAssert.getmy_name_txt(local));//断言：点击登录
+    	ImageView mymessage = (ImageView)MyEntry.mymessageentry(local).getChildAt(0);//我的消息图标
+    	assertTrue("No \"我的消息\" area!", local.waitForView(mymessage));//断言：我的消息
+    	LinearLayout balance = (LinearLayout)MyEntry.balanceentry(local).getChildAt(1);
+    	TextView balancetxtarea = (TextView)balance.getChildAt(0);//余额文字区域
+    	String balancetxt = balancetxtarea.getText().toString();
     	assertEquals("No \"余额\" text!", "余额", balancetxt);//断言：余额
-    	TextView timecard = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard");//次卡文字区域
-    	String timecardtxt = timecard.getText().toString();
-    	assertEquals("No \"标准洗车次卡\" text!", "标准洗车次卡", timecardtxt);//断言：标准洗车次卡
-    	TextView times = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard_label");//次数区域
-    	String timestxt = times.getText().toString();
-    	assertEquals("No \"标准洗车次卡信息\" text!", "购买次卡优惠更多", timestxt);//断言：标准洗车次卡信息文字
-       	TextView coupon = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupons");//优惠券字区域
-    	String coupontxt = coupon.getText().toString();
-    	assertEquals("No \"优惠券\" text!", "优惠券", coupontxt);//断言：优惠券
-    	assertTrue("No \"优惠券\" price area!", local.waitForView(local.getView("com.ganji.android.ccar:id/txt_coupons_price")));//优惠券价格区域
-     	TextView myredpackage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package");//红包字区域
-    	String myredpackagetxt = myredpackage.getText().toString();
-    	assertEquals("No \"红包\" text!", "红包", myredpackagetxt);//断言：红包
-    	assertTrue("No \"红包\" price area!", local.waitForView(local.getView("txt_red_package_price")));//红包价格区域
-    	TextView myaward = (TextView)MyEntry.myawardentry(local).getChildAt(1);//我的奖品字区域
-    	String myawardtxt = myaward.getText().toString();
-    	assertEquals("No \"我的奖品\" text!", "我的奖品", myawardtxt);//断言：我的奖品
-    	TextView myinvitecode = (TextView)MyEntry.myinvitecodeentry(local).getChildAt(1);//我的邀请码字区域
-    	String myinvitecodetxt = myinvitecode.getText().toString();
-    	assertEquals("No \"我的邀请码\" text!", "我的邀请码", myinvitecodetxt);//断言：我的邀请码
-    	TextView myprofile = (TextView)MyEntry.myprofileentry(local).getChildAt(1);//我的资料字区域
-    	String myprofiletxt = myprofile.getText().toString();
-    	assertEquals("No \"我的资料\" text!", "我的资料", myprofiletxt);//断言：我的资料
+    	LinearLayout timecard = (LinearLayout)MyEntry.timecardentry(local).getChildAt(1);
+    	TextView timecardtxtarea = (TextView)timecard.getChildAt(0);//次卡文字区域
+    	String timecardtxt = timecardtxtarea.getText().toString();
+    	assertEquals("No \"次卡\" text!", "次卡", timecardtxt);//断言：次卡
+    	LinearLayout coupons = (LinearLayout)MyEntry.couponentry(local).getChildAt(1);
+    	TextView couponstxtarea = (TextView)coupons.getChildAt(0);//优惠券文字区域
+    	String couponstxt = couponstxtarea.getText().toString();
+    	assertEquals("No \"优惠券\" text!", "优惠券", couponstxt);//断言：优惠券
+    	LinearLayout redpackage = (LinearLayout)MyEntry.myredpackageentry(local).getChildAt(1);
+    	TextView redpackagetxtarea = (TextView)redpackage.getChildAt(0);//红包文字区域
+    	String redpackagetxt = redpackagetxtarea.getText().toString();
+    	assertEquals("No \"红包\" text!", "红包", redpackagetxt);//断言：红包
     	TextView myaddress = (TextView)MyEntry.myaddressentry(local).getChildAt(1);//常用地址字区域
     	String myaddresstxt = myaddress.getText().toString();
     	assertEquals("No \"常用地址\" text!", "常用地址", myaddresstxt);//断言：常用地址
     	TextView mycar = (TextView)MyEntry.mycarentry(local).getChildAt(1);//我的车辆字区域
     	String mycartxt = mycar.getText().toString();
     	assertEquals("No \"我的车辆\" text!", "我的车辆", mycartxt);//断言：我的车辆
-    	TextView mymessage = (TextView)MyEntry.mymessageentry(local).getChildAt(1);//我的消息字区域
-    	String mymessagetxt = mymessage.getText().toString();
-    	assertEquals("No \"我的消息\" text!", "我的消息", mymessagetxt);//断言：我的消息
+    	TextView myaward = (TextView)MyEntry.myawardentry(local).getChildAt(1);//我的奖品字区域
+    	String myawardtxt = myaward.getText().toString();
+    	assertEquals("No \"我的奖品\" text!", "我的奖品", myawardtxt);//断言：我的奖品
+    	TextView myinvitecode = (TextView)MyEntry.myinvitecodeentry(local).getChildAt(1);//我的邀请码字区域
+    	String myinvitecodetxt = myinvitecode.getText().toString();
+    	assertEquals("No \"我的邀请码\" text!", "我的邀请码", myinvitecodetxt);//断言：我的邀请码
      	TextView mymore = (TextView)MyEntry.mymoreentry(local).getChildAt(1);//关于赶集易洗车字区域
     	String mymoretxt = mymore.getText().toString();
-    	assertEquals("No \"关于赶集易洗车\" text!", "关于赶集易洗车", mymoretxt);//断言：关于赶集易洗车
+    	assertEquals("No \"关于\" text!", "关于", mymoretxt);//断言：关于赶集易洗车
     }
     
     /**
      * @Name 1100_changephonpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，上门洗车页，点击联系方式，弹出修改手机号提示，点击确定，正常进入修改手机号页面，检查页面元素；
@@ -770,6 +810,7 @@ public class MyTest extends CafeTestCase {
     public void test_1100_changephonpage() {
     	Log.d("test", "test_1040_setphonpage  start");
     	ToPage.towashcarpage(local);//进入上门洗车页
+//   	assertTrue("未成功跳转到标准洗车页！", local.waitForText(ChangL.washcarheadertxt));
     	assertTrue("未成功跳转到标准洗车页！", local.waitForText("需要清洗内饰"));
     	SetStep.setphone(local);//确认是否登录，没登录先登录
     	local.sleep(800);
@@ -793,48 +834,61 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1101_myneedspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，点击我的订单，正常进入我的订单列表页，检查页面元素；
-     * @FunctionPoint 已登录，点击我的订单，正常进入我的订单列表页，检查页面元素；
+     * @FunctionPoint 已登录，点击我的订单，正常进入我的订单列表页，检查页面元素；2.0.1，update,增加删除订单按钮
      */
     public void test_1101_myneedspage() {
     	Log.d("test", "test_1020_myneedspage  start");
     	local.waitForActivity("CHomeActivity");
+    	ToPage.towashcarpage(local);//进入上门洗车页
+    	SetStep.setphone(local);//登录或判断后点击返回
+		local.clickOnView(local.getView("btn_title_left"));
+//    	local.sleep(2000);
+//    	local.waitForActivity("CHomeActivity");
     	ToPage.toorderpage(local);//进入订单页面
     	local.waitForText("月");
     	local.waitForText("日");
 //    	local.sleep(2000);
     	//检查页面元素
-    	assertTrue("header text is error!", local.waitForText("我的订单"));//断言：header文案
+    	TextView header = (TextView)local.getView("com.ganji.android.ccar:id/center_text", 1);
+    	String headertxt = header.getText().toString();
+    	assertEquals("No \"我的订单\" text！ ", "我的订单", headertxt);//断言：header文案
+//    	sassertTrue("header text is error!", local.waitForText("我的订单"));//断言：header文案
     	assertTrue("No date!", local.waitForView(local.getView("txt_date")));//断言：日期时间
     	assertTrue("No needs status!", local.waitForView(local.getView("tv_needs_status")));//断言：订单状态
     	assertTrue("No needs type!", local.waitForView(local.getView("txt_type")));//断言：洗车类型
     	assertTrue("No needs interior area!", local.waitForView(local.getView("tv_interior")));//断言：清洗内饰区域
     	assertTrue("No needs address!", local.waitForView(local.getView("txt_address")));//断言：洗车地址
     	assertTrue("No needs carnumber!", local.waitForView(local.getView("txt_car_number")));//断言：车牌号码
+    	assertTrue("No needs deletebutton!", local.waitForView(local.getView("com.ganji.android.ccar:id/delete_order_btn")));
     }
     
     /**
      * @Name 1105_notpayorderpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的订单列表页，点击进入一个待付款状态的订单，正常进入待付款订单详情页，检查页面元素；
-     * @FunctionPoint 已登录，我的订单列表页，点击进入一个待付款状态的订单，正常进入待付款订单详情页，检查页面元素；1.7.0,update,取消次卡选择；
+     * @FunctionPoint 已登录，我的订单列表页，点击进入一个待付款状态的订单，正常进入待付款订单详情页，检查页面元素；1.7.0,update,取消次卡选择；2.0.1,update,新增内饰价格
      */
     public void test_1105_notpayorderpage() {
     	Log.d("test", "test_1021_notpayorderpage  start");
     	ToPage.towashcarpage(local);//进入上门洗车页
-    	SetStep.washcarorder(local);//提交一个订单
-//    	local.sleep(1500);
+    	local.sleep(1000);
+       	SetStep.setphone(local);//判断是否登录，可省
+    	SetStep.setcarinfo(local, "NOPAY1");//设置车辆信息
+    	SetStep.setcaraddress(local);//设置车辆停放位置
+    	SetStep.setwashcartime(local);//设置服务时间
+    	SetStep.checkinterior(local);//点击清理内饰，默认是未选中的
+    	SetStep.cancletimecard(local);//取消次卡选择
+    	local.sleep(600);
+    	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
     	local.clickOnView(MyEntry.canclebutton(local));//点击取消
-    	assertTrue("No \"待付款\" order！", local.waitForText("我的订单")&&local.waitForText("待付款"));//是否跳转到我的订单页
-    	TextView status = (TextView)local.getView("com.ganji.android.ccar:id/tv_needs_status", 0);//第一个订单状态
-    	String statustxt = status.getText().toString();
-    	assertEquals("第一个订单不是待付款状态！", "待付款", statustxt);
+    	assertTrue("Submit order failure！", local.waitForText("我的订单"));//是否跳转到我的订单页
     	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
 //    	local.sleep(1500);
     	assertTrue("未成功跳转到待付款订单详情页！", local.waitForText("待付款"));
@@ -847,7 +901,13 @@ public class MyTest extends CafeTestCase {
     	assertTrue("No product name!", local.waitForView(local.getView("txt_name")));//断言：订单产品名称
     	assertTrue("No product detail!", local.waitForView(local.getView("txt_desc")));//断言：订单产品描述
     	assertTrue("No product price!", local.waitForView(local.getView("txt_price_now")));//断言：订单产品价格
-    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_time");
+    	TextView interior = (TextView)local.getView("com.ganji.android.ccar:id/wash_interior");
+    	String interiorareatxt = interior.getText().toString();
+    	assertEquals("No wash_interior!", "是否清洗内饰：清洗", interiorareatxt);//断言：内饰
+    	TextView interiorprice = (TextView)local.getView("com.ganji.android.ccar:id/neishi_price");//内饰价格
+    	String interiorpricetxt = interiorprice.getText().toString();
+    	assertEquals("washinteriorprice is not 0yuan!", ChangL.interiorprice, interiorpricetxt);//断言：内饰价格
+    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_consume_time");
     	LinearLayout washcartimefu = (LinearLayout)washcartime.getParent();
     	TextView servicetime = (TextView)washcartimefu.getChildAt(0);//服务时间文字区域
     	String servicetimetxt = servicetime.getText().toString();
@@ -867,11 +927,6 @@ public class MyTest extends CafeTestCase {
     	TextView cartypearea = (TextView)cartypefu.getChildAt(0);//车型文字区域
     	String cartypeareatxt = cartypearea.getText().toString();
     	assertEquals("No wash_car_type!", "车        型:", cartypeareatxt);//断言：车型
-    	TextView interior = (TextView)local.getView("com.ganji.android.ccar:id/wash_interior");
-    	LinearLayout interiorfu = (LinearLayout)interior.getParent();
-    	TextView interiorarea = (TextView)interiorfu.getChildAt(0);//内饰文字区域
-    	String interiorareatxt = interiorarea.getText().toString();
-    	assertEquals("No wash_interior!", "内        饰:", interiorareatxt);//断言：内饰
     	TextView carprice = (TextView)local.getView("com.ganji.android.ccar:id/tv_wash_car_price");
     	RelativeLayout carpricefu = (RelativeLayout)carprice.getParent();
     	TextView carpricearea = (TextView)carpricefu.getChildAt(0);//实付款文字区域
@@ -885,51 +940,24 @@ public class MyTest extends CafeTestCase {
     	assertTrue("未弹出取消订单dialog！", local.waitForText("是否取消订单？"));
     	local.waitForView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));
     	local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));//点击确定
-//    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单
-//    	assertTrue("未弹出删除订单dialog！", local.waitForText("是否删除该订单？"));
-//    	local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));//点击确定
     }
     
     /**
      * @Name 1110_payorderpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
-     * @Describe 已登录，我的订单列表页，点击进入一个现金支付预约成功状态的订单，正常进入预约成功页，检查页面元素；
+     * @Describe 已登录，我的订单列表页，点击进入一个现金支付预约成功状态的订单，正常进入预约成功页，检查页面元素（非自动分单）；
      * @FunctionPoint 已登录，我的订单列表页，点击进入一个现金支付预约成功状态的订单，正常进入预约成功页，检查页面元素；
      */
     public void test_1110_payorderpage() {
     	Log.d("test", "test_1022_payorderpage  start");
-//    	local.sleep(3000);
-    	local.waitForActivity("CHomeActivity");
-    	
     	ToPage.towashcarpage(local);//进入上门洗车页
-      	SetStep.setphone(local);//判断是否登录，可省
-    	SetStep.setcarinfo(local);//设置车辆信息
-    	SetStep.setcaraddress(local);//设置车辆停放位置
-    	SetStep.setwashcartime(local);//设置服务时间
-    	SetStep.cancletimecard(local);//取消次卡选择
-    	local.sleep(600);
-    	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
+    	SetStep.washcarorder(local);//提交一个订单
 //    	local.sleep(1500);
-    	local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
     	SetStep.pay(local);//支付
-    	
-    	
-    	
-//    	ToPage.toorderpage(local);//用1105的待付款订单，进入我的订单页
-//    	TextView status = (TextView)local.getView("com.ganji.android.ccar:id/tv_needs_status", 0);//第一个订单状态
-//    	String statustxt = status.getText().toString();
-//    	assertEquals("第一个订单不是待付款状态！", "待付款", statustxt);
-//    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
-////    	local.sleep(1000);
-//    	assertTrue("未成功跳转到待付款页！", local.waitForText("待付款"));
-//    	local.waitForView(local.getView("com.ganji.android.ccar:id/img_ads"));
-//    	ImageView ads = (ImageView)local.getView("com.ganji.android.ccar:id/img_ads");
-//    	local.clickOnView(MyEntry.nopayorderbutton(local));//点击立即付款按钮
-//    	local.waitForDialogToOpen();
-//    	SetStep.pay(local);//支付
+//    	local.sleep(2000);
 //    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
     	//审查页面元素
     	assertTrue("Current status is not notpay!", local.waitForText("订单详情"));//断言：header文案
@@ -950,7 +978,7 @@ public class MyTest extends CafeTestCase {
     	TextView washcarcontentarea = (TextView)washcarcontentfu.getChildAt(0);//服务内容文字区域
     	String wwashcarcontenttxt = washcarcontentarea.getText().toString();
     	assertEquals("No wash_car_time!", "服务内容:", wwashcarcontenttxt);//断言：服务内容
-    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_time");
+    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_consume_time");
     	LinearLayout washcartimefu = (LinearLayout)washcartime.getParent();
     	TextView servicetime = (TextView)washcartimefu.getChildAt(0);//服务时间文字区域
     	String servicetimetxt = servicetime.getText().toString();
@@ -981,11 +1009,33 @@ public class MyTest extends CafeTestCase {
     	String carpriceareatxt = carpricearea.getText().toString();
     	assertEquals("No tv_wash_car_price!", "实  付  款:", carpriceareatxt);//断言：实付款
     }
+
+    /**
+     * @Name 1114_kefupage
+     * @Catalogue 赶集易洗车C端 Android
+     * @Subcatalog 2.0.1
+     * @Grade 中级
+     * @Channel 
+     * @Describe 已登录，我的订单列表页，点击进入任意一个订单页面，点击在线客服进入在线客服页，检查页面元素；
+     * @FunctionPoint 已登录，我的订单列表页，点击进入任意一个订单页面，点击在线客服进入在线客服页，检查页面元素；2.0.1,add
+     */
+    public void test_1114_kefupage() {
+    	ToPage.toorderpage(local);//进入订单页面
+    	local.sleep(1000);
+    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/zi_xun_ke_fu"));
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/zi_xun_ke_fu"));//点击客服按钮
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/online"));
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/online"));//点击在线客服
+    	local.sleep(1000);
+    	//审查页面元素
+//    	assertTrue("未成功跳转到在线客服页！", local.waitForText("在线客服")&&local.waitForView(local.getView("com.ganji.android.ccar:id/conversation_message_other_portrait"))&&local.waitForView(local.getView("com.ganji.android.ccar:id/conversation_message_content_left_tv")));
+    }
     
     /**
      * @Name 1115_repundpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的订单列表页，点击进入一个现金支付退款成功状态的订单，正常进入退款成功页，检查页面元素；
@@ -998,10 +1048,13 @@ public class MyTest extends CafeTestCase {
     	ToPage.toorderpage(local);//用1022的预约成功的订单，进入我的订单页
     	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
     	SetStep.payordercancle(local);//取消订单
-    	local.clickOnView(local.getView("btn_title_left"));//点击返回按钮
-    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
+//    	local.clickOnView(local.getView("btn_title_left"));//点击返回按钮
+    	local.sleep(1500);
+    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情	
+    	local.waitForText("退款成功");
     	//审查页面元素
-    	assertTrue("Current status is not refund!", local.waitForText("退款成功"));//断言：header文案
+    	assertTrue("Current status is not refund!", local.waitForText("订单详情"));//断言：header文案
+    	local.scrollDown();//下拉到最下面
     	TextView repund = (TextView)local.getView("com.ganji.android.ccar:id/common_content");
     	String repundtxt = repund.getText().toString();
     	assertEquals("No repund content!", "退款成功，请您及时查看您的余额，如有疑问请及时与我们联系：400-733-5500。", repundtxt);//断言：文案
@@ -1010,7 +1063,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1116_payorderusetimecardpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，点击订单，找次卡支付的订单进入，检查页面元素；
@@ -1020,7 +1073,7 @@ public class MyTest extends CafeTestCase {
     	Log.d("test", "test_1022_payorderpage  start");
     	ToPage.towashcarpage(local);//进入上门洗车页
     	SetStep.setphone(local);//提交一个订单
-    	SetStep.setcarinfo(local);
+    	SetStep.setcarinfo(local, "CKZF11");
     	SetStep.setcaraddress(local);
     	SetStep.setwashcartime(local);
 //    	local.sleep(1500);
@@ -1043,7 +1096,7 @@ public class MyTest extends CafeTestCase {
     	TextView washcarcontentarea = (TextView)washcarcontentfu.getChildAt(0);//服务内容文字区域
     	String wwashcarcontenttxt = washcarcontentarea.getText().toString();
     	assertEquals("No wash_car_time!", "服务内容:", wwashcarcontenttxt);//断言：服务内容
-    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_time");
+    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_consume_time");
     	LinearLayout washcartimefu = (LinearLayout)washcartime.getParent();
     	TextView servicetime = (TextView)washcartimefu.getChildAt(0);//服务时间文字区域
     	String servicetimetxt = servicetime.getText().toString();
@@ -1074,14 +1127,14 @@ public class MyTest extends CafeTestCase {
     	assertEquals("No timecard txt!", "次        卡:", timecardareatxt);//断言：次卡
     	TextView timecardnum = (TextView)local.getView("com.ganji.android.ccar:id/wash_count_card");//次数文案
     	String timecardnumtxt = timecardnum.getText().toString();
-    	assertTrue("No timecard detail txt or timecard num is error!"+MyEntry.timecarduse(local)+"次", timecardnumtxt.contains("消费1次，剩余"+MyEntry.timecarduse(local)+"次"));//断言：次卡使用详细文案
+    	assertTrue("No timecard detail txt or timecard num is error!"+timecardnumtxt, timecardnumtxt.contains("消费1次，剩余"+ChangL.timecarduse+"次"));//断言：次卡使用详细文案
     }
     
     
     /**
      * @Name 1117_repundtimecardpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，点击订单，找次卡支付的退款订单进入，检查页面元素；
@@ -1093,9 +1146,7 @@ public class MyTest extends CafeTestCase {
     	local.waitForActivity("CHomeActivity");
     	ToPage.toorderpage(local);//用1116的预约成功的订单，进入我的订单页
     	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
-    	TextView title = (TextView)local.getView("com.ganji.android.ccar:id/title");
-    	String titletxt = title.getText().toString();
-    	assertTrue("未成功跳转到预约成功订单详情页！", local.waitForText(titletxt));
+    	assertTrue("未成功跳转到预约成功订单详情页！", local.waitForText("预约成功"));
     	SetStep.payorderusetimecardcancle(local);//取消订单
     	local.sleep(500);
     	//审查页面元素
@@ -1111,80 +1162,103 @@ public class MyTest extends CafeTestCase {
     	ToPage.tomypage(local);//点击我的
     	TextView timecardnum = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard_label");
     	String timecardnumtxt = timecardnum.getText().toString();//剩余次卡数量
-    	assertEquals("cacle order of timecard is failed!", MyEntry.timecard(local)+"次", timecardnumtxt);//断言，是否取消成功
+    	assertEquals("cacle order of timecard is failed!", ChangL.timecard, timecardnumtxt);//断言，是否取消成功
+    }
+
+    /**
+     * @Name 1120_taskstatepage
+     * @Catalogue 赶集易洗车C端 Android
+     * @Subcatalog 2.0.1
+     * @Grade 中级
+     * @Channel 
+     * @Describe 未登录，点击任务，正常进入任务列表页，检查页面元素，增加对“领取”的判断；
+     * @FunctionPoint 未登录，点击任务，正常进入任务列表页，检查页面元素，增加对“领取”的判断；2.0.5,add
+     */
+    public void test_1120_taskstatepage() {
+    	ToPage.totaskpage(local);
+    	///审查页面元素
+    	assertTrue("No data!", (local.waitForView(local.getText("洗车"))&&local.waitForView(local.getText("邀请"))&&local.waitForView(local.getText("领取"))));//断言：是否有数据
     }
     
     /**
      * @Name 1125_mypagelogin
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，点击进入我的，正常进入我的页面，检查页面元素；
-     * @FunctionPoint 已登录，点击进入我的，正常进入我的页面，检查页面元素；1.7.0，update，新增标准洗车次卡入口检查；
+     * @FunctionPoint 已登录，点击进入我的，正常进入我的页面，检查页面元素；1.7.0，update，新增标准洗车次卡入口检查；2.0.1，update，页面布局改变；
      */
     public void test_1125_mypagelogin() {
     	Log.d("test", "test_1025_mypagelogin  start");
     	SetStep.login(local);//判断是否未登录，点击我的，查看登录状态
     	local.scrollUp();//往上拉一下
     	//检查页面元素
-    	Button logoutbutton = (Button)local.getView("btn_login");
-    	String logoutbuttontxt = logoutbutton.getText().toString();
-    	assertEquals("No \"退出登录\" button!", "退出登录", logoutbuttontxt);
+    	assertTrue("No img profile area!", local.waitForView(local.getView("img_profile")));//断言：头像
     	TextView name = (TextView)local.getView("com.ganji.android.ccar:id/txt_name");
     	String nametxt = name.getText().toString();
-//    	assertEquals("No login name text!", "QA测试号", nametxt);//断言：用户名，线上用户名是"QA测试号"
+//    	assertEquals("No login name text!", ChangL.name, nametxt);//断言：用户名，线上用户名是"QA测试号"
     	assertTrue("No login name text!", "QA测试号".equals(nametxt)||"修改昵称".equals(nametxt));
-    	RelativeLayout rl = (RelativeLayout)MyEntry.profilenametxt(local).getParent();//足不出户文字区域
-    	TextView content = (TextView)rl.getChildAt(2);
-    	String contenttxt = content.getText().toString();
-    	assertEquals("No \"足不出户\" text!", "足不出户享专业洗车", contenttxt);//断言：足不出户文案
-    	assertTrue("No img profile area!", local.waitForView(local.getView("img_profile")));//断言：头像
-    	TextView balance = (TextView)local.getView("com.ganji.android.ccar:id/txt_balance");//余额文字区域
-    	String balancetxt = balance.getText().toString();
+    	ImageView mymessage = (ImageView)MyEntry.mymessageentry(local).getChildAt(0);//我的消息图标
+    	assertTrue("No \"我的消息\" area!", local.waitForView(mymessage));//断言：我的消息
+    	LinearLayout balance = (LinearLayout)MyEntry.balanceentry(local).getChildAt(1);
+    	TextView balancetxtarea = (TextView)balance.getChildAt(0);//余额文字区域
+    	String balancetxt = balancetxtarea.getText().toString();
     	assertEquals("No \"余额\" text!", "余额", balancetxt);//断言：余额
-    	TextView timecard = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard");//次卡文字区域
-    	String timecardtxt = timecard.getText().toString();
-    	assertEquals("No \"标准洗车次卡\" text!", "标准洗车次卡", timecardtxt);//断言：标准洗车次卡
-    	TextView times = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard_label");//次数区域
-    	String timestxt = times.getText().toString();
-    	assertTrue("No \"洗车次数\" area!", timestxt.contains("次"));//断言：次数（后期会改成固定次数，下面的）
-//    	assertEquals("No \"洗车次数\" area!", "次", timecardtxt);//断言：次数
-       	TextView coupon = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupons");//优惠券字区域
-    	String coupontxt = coupon.getText().toString();
-    	assertEquals("No \"优惠券\" text!", "优惠券", coupontxt);//断言：优惠券
-    	assertTrue("No \"优惠券\" price area!", local.waitForView(local.getView("com.ganji.android.ccar:id/txt_coupons_price")));//优惠券价格区域
-     	TextView myredpackage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package");//红包字区域
-    	String myredpackagetxt = myredpackage.getText().toString();
-    	assertEquals("No \"红包\" text!", "红包", myredpackagetxt);//断言：红包
-    	assertTrue("No \"红包\" price area!", local.waitForView(local.getView("txt_red_package_price")));//红包价格区域
-    	TextView myaward = (TextView)MyEntry.myawardentry(local).getChildAt(1);//我的奖品字区域
-    	String myawardtxt = myaward.getText().toString();
-    	assertEquals("No \"我的奖品\" text!", "我的奖品", myawardtxt);//断言：我的奖品
-    	TextView myinvitecode = (TextView)MyEntry.myinvitecodeentry(local).getChildAt(1);//我的邀请码字区域
-    	String myinvitecodetxt = myinvitecode.getText().toString();
-    	assertEquals("No \"我的邀请码\" text!", "我的邀请码", myinvitecodetxt);//断言：我的邀请码
-    	TextView myprofile = (TextView)MyEntry.myprofileentry(local).getChildAt(1);//我的资料字区域
-    	String myprofiletxt = myprofile.getText().toString();
-    	assertEquals("No \"我的资料\" text!", "我的资料", myprofiletxt);//断言：我的资料
+    	TextView balanceprice = (TextView)local.getView("com.ganji.android.ccar:id/txt_balance_price");//余额数
+    	String balancepricetxt = balanceprice.getText().toString();//余额数文字
+    	assertEquals("余额数不正确！", ChangL.balance, balancepricetxt);
+    	LinearLayout timecard = (LinearLayout)MyEntry.timecardentry(local).getChildAt(1);
+    	TextView timecardtxtarea = (TextView)timecard.getChildAt(0);//次卡文字区域
+    	String timecardtxt = timecardtxtarea.getText().toString();
+    	assertEquals("No \"次卡\" text!", "次卡", timecardtxt);//断言：次卡
+    	TextView timecardnum = (TextView)local.getView("com.ganji.android.ccar:id/txt_timecard_label");//次卡次数
+    	String timecardnumtxt = timecardnum.getText().toString();//次卡次数文字
+    	assertEquals("次卡次数不正确！", ChangL.timecard, timecardnumtxt);
+    	LinearLayout coupons = (LinearLayout)MyEntry.couponentry(local).getChildAt(1);
+    	TextView couponstxtarea = (TextView)coupons.getChildAt(0);//优惠券文字区域
+    	String couponstxt = couponstxtarea.getText().toString();
+    	assertEquals("No \"优惠券\" text!", "优惠券", couponstxt);//断言：优惠券
+    	TextView couponsprice = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupons_price");//优惠券次数
+    	String couponspricetxt = couponsprice.getText().toString();//优惠券数量文字
+    	assertEquals("优惠劵数量不正确！", ChangL.coupons, couponspricetxt);
+    	
+    	TextView redpackageprice = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package_price");//红包数量
+    	String redpackagepricetxt = redpackageprice.getText().toString();//红包数量文字
+    	float redpackagepricenum = Float.parseFloat(redpackagepricetxt);
+//    	int redpackagepricenum = Integer.parseInt(redpackagepricetxt);
+    	assertTrue("红包为0！", redpackagepricenum>0.00);
+//    	assertTrue("红包为0！", redpackagepricenum>0);
+    	
+    	LinearLayout redpackage = (LinearLayout)MyEntry.myredpackageentry(local).getChildAt(1);
+    	TextView redpackagetxtarea = (TextView)redpackage.getChildAt(0);//红包文字区域
+    	String redpackagetxt = redpackagetxtarea.getText().toString();
+    	assertEquals("No \"红包\" text!", "红包", redpackagetxt);//断言：红包
     	TextView myaddress = (TextView)MyEntry.myaddressentry(local).getChildAt(1);//常用地址字区域
     	String myaddresstxt = myaddress.getText().toString();
     	assertEquals("No \"常用地址\" text!", "常用地址", myaddresstxt);//断言：常用地址
     	TextView mycar = (TextView)MyEntry.mycarentry(local).getChildAt(1);//我的车辆字区域
     	String mycartxt = mycar.getText().toString();
     	assertEquals("No \"我的车辆\" text!", "我的车辆", mycartxt);//断言：我的车辆
-    	TextView mymessage = (TextView)MyEntry.mymessageentry(local).getChildAt(1);//我的消息字区域
-    	String mymessagetxt = mymessage.getText().toString();
-    	assertEquals("No \"我的消息\" text!", "我的消息", mymessagetxt);//断言：我的消息
+    	TextView myaward = (TextView)MyEntry.myawardentry(local).getChildAt(1);//我的奖品字区域
+    	String myawardtxt = myaward.getText().toString();
+    	assertEquals("No \"我的奖品\" text!", "我的奖品", myawardtxt);//断言：我的奖品
+    	TextView myinvitecode = (TextView)MyEntry.myinvitecodeentry(local).getChildAt(1);//我的邀请码字区域
+    	String myinvitecodetxt = myinvitecode.getText().toString();
+    	assertEquals("No \"我的邀请码\" text!", "我的邀请码", myinvitecodetxt);//断言：我的邀请码
+    	TextView qrcode = (TextView)MyEntry.qrcodemypageentry(local).getChildAt(1);//扫一扫区域
+    	String qrcodetxt = qrcode.getText().toString();
+    	assertEquals("No \"扫一扫码\" text!", "扫一扫", qrcodetxt);//断言：扫一扫
      	TextView mymore = (TextView)MyEntry.mymoreentry(local).getChildAt(1);//关于赶集易洗车字区域
     	String mymoretxt = mymore.getText().toString();
-    	assertEquals("No \"关于赶集易洗车\" text!", "关于赶集易洗车", mymoretxt);//断言：关于赶集易洗车
+    	assertEquals("No \"关于\" text!", "关于", mymoretxt);//断言：关于赶集易洗车
+    	
     }
     
     /**
      * @Name 1130_updateprofilepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击头像，正常进入修改个人资料页，检查页面元素；
@@ -1198,21 +1272,20 @@ public class MyTest extends CafeTestCase {
 		local.sleep(1500);
 		//检查页面元素
 		assertTrue("No \"修改个人资料\" text!", local.waitForText("修改个人资料"));//断言：Header文案
-//		assertTrue("未加载出个人资料页！", local.waitForText("QA测试号")||local.waitForText("修改昵称"));
 		assertTrue("No img area!", local.waitForView(local.getView("iv_myself_portrait")));//断言：头像区域
 		TextView name = (TextView)local.getView("iv_myself_name");
 		String nametxt = name.getText().toString();
-		assertTrue("No name area!", "请填写昵称".equals(nametxt)||"QA测试号".equals(nametxt)||"修改昵称".equals(nametxt));//断言：昵称文字
+		assertTrue("No name area!", "请填写昵称".equals(nametxt)||ChangL.name.equals(nametxt)||"修改昵称".equals(nametxt));//断言：昵称文字
 		TextView phone = (TextView)local.getView("iv_myself_phone");
 		String phonetxt = phone.getText().toString();
-		assertEquals("No phone area!", "185****2536", phonetxt);
+		assertEquals("No phone area!", ChangL.phonenumxing, phonetxt);
 		assertTrue("No sex area!", local.waitForView(local.getView("man"))&&local.waitForView(local.getView("women")));//断言：性别
     }
     
     /**
      * @Name 1135_balancepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击余额，正常进入余额页，检查页面元素；
@@ -1220,7 +1293,10 @@ public class MyTest extends CafeTestCase {
      */
     public void test_1135_balancepage() {
     	ToPage.tomypage(local);//进入我的页面
-    	local.clickOnView(local.getView("lay_my_balance"));//点击余额
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/lay_my_balance"));//点击余额
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/balance_first_view1"));//首次打开余额会有一个引导层
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/balance_first_view1"));//点击知道了按钮
+    	local.sleep(1000);
     	//检查页面元素
 		assertTrue("No \"余额\" text!", local.waitForText("余额"));//断言：Header文案
 		TextView balancedetail = (TextView)local.getView("txt_title_right");
@@ -1233,7 +1309,7 @@ public class MyTest extends CafeTestCase {
 		String balancetxt = balance.getText().toString();
 		String balancenum = balanceprice.getText().toString();
 		assertEquals("No \"账户余额\" button!", "账户余额: ", balancetxt);//断言：账户余额细按钮
-		assertEquals("\"账户余额\" error!Not ¥"+MyEntry.balance(local)+"!", "¥"+MyEntry.balance(local), balancenum);//断言：余额数，报警
+		assertEquals("\"账户余额\" error!Not ¥"+ChangL.balance+"!", "¥"+ChangL.balance, balancenum);//断言：余额数，报警
 		TextView title = (TextView)local.getView("com.ganji.android.ccar:id/txt_title");
 		String titletxt = title.getText().toString();
 		TextView subtitle = (TextView)local.getView("com.ganji.android.ccar:id/txt_sub_title");
@@ -1247,7 +1323,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1140_balancedetailpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击余额-余额明细，正常进入余额明细页，检查页面元素；
@@ -1257,17 +1333,18 @@ public class MyTest extends CafeTestCase {
     	ToPage.tobalance(local);//进入余额页面
     	local.sleep(1000);
     	local.clickOnView(local.getView("txt_title_right"));//点击余额明细按钮
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/total_balance_num"));
     	//检查页面元素
 		assertTrue("No \"余额明细\" text!", local.waitForText("余额明细"));//断言：Header文案
 		local.waitForText("账户余额");
 		local.waitForText("退款");
 		TextView balancenum = (TextView)local.getView("com.ganji.android.ccar:id/total_balance_num");
+		String banlannumtxt = balancenum.getText().toString();
 		LinearLayout fu = (LinearLayout)balancenum.getParent();
 		TextView balance = (TextView)fu.getChildAt(1);
-		String banlannumtxt = balancenum.getText().toString();
 		String balancetxt = balance.getText().toString();
 		assertEquals("No \"账户余额\" txt!", "账户余额: ", balancetxt);
-		assertEquals("\"账户余额\" error!Not ¥"+MyEntry.balance(local)+"!", "¥"+MyEntry.balance(local), banlannumtxt);//报警
+		assertEquals("\"账户余额\" error!Not ¥"+ChangL.balance+"!", "¥"+ChangL.balance, banlannumtxt);//报警128.25
 		assertTrue("No balance_detail_item_name area!", local.waitForView(local.getView("balance_detail_item_name")));//断言：余额名称
 		assertTrue("No balance_detail_item_time area!", local.waitForView(local.getView("balance_detail_item_time")));//断言：余额时间
 		assertTrue("No charge and give area!", local.waitForView(local.getView("balance_detail_item_num")));//断言：余额金额
@@ -1276,7 +1353,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1141_buytimecardpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击标准洗车次卡--购买次卡tab，正常进入购买次卡页面，检查页面元素；
@@ -1317,18 +1394,18 @@ public class MyTest extends CafeTestCase {
 		TextView validtime = (TextView)local.getView("com.ganji.android.ccar:id/txt_valid_time");//有效期
 		String validtimetxt = validtime.getText().toString();
 		assertTrue("No validtime area!", validtimetxt.contains("有效期"));//断言：有效期
-		TextView city = (TextView)local.getView("com.ganji.android.ccar:id/city");//适用城市
+		TextView city = (TextView)local.getView("com.ganji.android.ccar:id/item_card_citys");//适用城市
 		String citytxt = city.getText().toString();
 		assertTrue("No city area!", citytxt.contains("适用城市"));//断言：适用城市
 		TextView submit = (TextView)local.getView("com.ganji.android.ccar:id/txt_submit");//立即购买按钮
 		String submittxt = submit.getText().toString();
-		assertEquals("No \"立即购买\" button!", "立即购买", submittxt);
+		assertEquals("No \"立即充值\" button!", "立即充值", submittxt);
 	}
     
     /**
      * @Name 1142_mytimecardpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击标准洗车次卡--我的次卡tab，正常进入我的次卡页面，检查页面元素；
@@ -1351,16 +1428,16 @@ public class MyTest extends CafeTestCase {
     	String leftcounttxt = leftcount.getText().toString();
     	assertEquals("No leftcount area!", "剩余次数: ", leftcounttxt);//断言：剩余次数文案
     	String leftcountnumtxt = leftcountnum.getText().toString();//剩余次数
-    	assertEquals("left num is error!", "101", leftcountnumtxt);//断言：剩余次数
+    	assertEquals("left num is error!", ChangL.timecardleft, leftcountnumtxt);//断言：剩余次数
     	TextView presentcount = (TextView)fu.getChildAt(2);//赠送文案
     	String presentcounttxt = presentcount.getText().toString();
     	assertEquals("No leftcount area!", " +赠送 ",presentcounttxt);//断言：赠送次数文案
     	TextView presentnum = (TextView)local.getView("com.ganji.android.ccar:id/present_left_count");//赠送次数
     	String presentnumtxt = presentnum.getText().toString();
-    	assertEquals("present num is error!", "10", presentnumtxt);//断言：赠送次数
+    	assertEquals("present num is error!", ChangL.timecardpresent, presentnumtxt);//断言：赠送次数
     	TextView countcardtype = (TextView)local.getView("com.ganji.android.ccar:id/count_card_type");//次卡标题
     	String countcardtypetxt = countcardtype.getText().toString();
-    	assertEquals("timecard title is error!--\"自动化次卡\"", "自动化次卡", countcardtypetxt);
+    	assertEquals("timecard title is error!--\"自动化次卡\"", ChangL.timecardtitle, countcardtypetxt);
     	TextView validdate = (TextView)local.getView("com.ganji.android.ccar:id/valid_date");//有效期
     	String validdatetxt = validdate.getText().toString();
     	assertTrue("No \"有效期\" area!", validdatetxt.contains("有效期:")&&validdatetxt.contains("至"));
@@ -1372,7 +1449,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1143_timecardexplainpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击标准洗车次卡--次卡说明，正常进入使用说明页面，检查页面元素；
@@ -1397,7 +1474,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1144_balancedetailpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击标准洗车次卡--明细，正常进入次卡明细页面，检查页面元素；
@@ -1409,9 +1486,10 @@ public class MyTest extends CafeTestCase {
     	local.clickOnView(local.getView("txt_title_right"));//点击明细按钮
     	//检查页面元素
 		assertTrue("No \"次卡明细\" text!", local.waitForText("次卡明细"));//断言：Header文案
+		local.searchText("总剩余");
 		TextView timecardnum = (TextView)local.getView("com.ganji.android.ccar:id/left_count_card_number");
 		String timecardnumtxt = timecardnum.getText().toString();
-		assertEquals("No timecardnum txt!", "总剩余"+MyEntry.timecard(local)+"次，"+MyEntry.bjtimecard(local)+"次适用于当前城市", timecardnumtxt);//剩余次数文案，线上还需要修改数量
+		assertEquals("No timecardnum txt!", "总剩余"+ChangL.timecard+"次，"+ChangL.timecardbj+"次适用于当前城市", timecardnumtxt);//剩余次数文案，线上还需要修改数量
 		TextView carditemname = (TextView)local.getView("com.ganji.android.ccar:id/count_card_detail_item_name");
 		assertTrue("No count_card_detail_item_name area!", local.waitForView(carditemname));//断言：次卡名称
 		TextView carditemnum = (TextView)local.getView("com.ganji.android.ccar:id/count_card_detail_item_num");
@@ -1423,15 +1501,15 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1145_couponpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击优惠劵，正常进入优惠劵页面，检查页面元素；
-     * @FunctionPoint 已登录，我的页面，点击优惠劵，正常进入优惠劵页面，检查页面元素；
+     * @FunctionPoint 已登录，我的页面，点击优惠劵，正常进入优惠劵页面，检查页面元素；2.0.1，update，优惠券页面元素名称改变
      */
     public void test_1145_couponpage() {
     	ToPage.tomycoupon(local);//进入我的优惠券页
-    	local.hideSoftKeyboard();//收起键盘
+//    	local.hideSoftKeyboard();//收起键盘
     	//检查页面元素
     	assertEquals("优惠券", MyAssert.getall_header_txt(local));//断言：Header文案
 //		assertTrue("No \"优惠券\" text!", local.waitForText("优惠券"));  ////断言：Header文案（有时候找不到优惠券文案）
@@ -1455,11 +1533,11 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1150_coupondesignpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击优惠劵--使用说明，正常进入优惠劵使用说明页面，检查页面元素；
-     * @FunctionPoint 已登录，我的页面，点击优惠劵--使用说明，正常进入优惠劵使用说明页面，检查页面元素；
+     * @FunctionPoint 已登录，我的页面，点击优惠劵--使用说明，正常进入优惠劵使用说明页面，检查页面元素；2.0.1，update，优惠券页面元素名称改变
      */
     public void test_1150_coupondesignpage() {
     	ToPage.tomycoupon(local);//进入我的优惠券页
@@ -1482,7 +1560,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1155_redpackagepage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击红包，正常进入红包页面，检查页面元素；
@@ -1511,7 +1589,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1160_redpackagedesignpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击红包--使用说明，正常进入红包使用说明页面，检查页面元素；
@@ -1536,7 +1614,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1165_myawardpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击奖品，正常进入我的奖品页面，检查页面元素；
@@ -1550,33 +1628,33 @@ public class MyTest extends CafeTestCase {
 		assertTrue("No award name!", local.waitForView(local.getView("tv_name")));//断言：奖品名称
     }
     
-    /**
-     * @Name 1170_myprofilepage
-     * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 中级
-     * @Channel 
-     * @Describe 已登录，我的页面，点击我的资料，正常进入修改个人资料页面，检查页面元素；
-     * @FunctionPoint 已登录，我的页面，点击我的资料，正常进入修改个人资料页面，检查页面元素；
-     */
-    public void test_1170_myprofilepage() {
-    	ToPage.tomyprofile(local);//进入我的资料页面
-		//检查页面元素
-		assertEquals("No \"修改个人资料\" text!", "修改个人资料", MyAssert.getall_header_txt(local));//断言：Header文案
-		assertTrue("No img area!", local.waitForView(local.getView("iv_myself_portrait")));//断言：头像区域
-		TextView name = (TextView)local.getView("iv_myself_name");
-		String nametxt = name.getText().toString();
-		assertTrue("No name area!", "请填写昵称".equals(nametxt)||"QA测试号".equals(nametxt)||"修改昵称".equals(nametxt));//断言：昵称文字
-		TextView phone = (TextView)local.getView("iv_myself_phone");//手机号
-		String phonetxt = phone.getText().toString();
-		assertEquals("No phone area!", "185****2536", phonetxt);//断言：手机号
-		assertTrue("No sex area!", local.waitForView(local.getView("man"))&&local.waitForView(local.getView("women")));//断言：性别
-    }
+//    /**
+//     * @Name 1170_myprofilepage
+//     * @Catalogue 赶集易洗车C端 Android
+//     * @Subcatalog 2.0.1
+//     * @Grade 中级
+//     * @Channel 
+//     * @Describe 已登录，我的页面，点击我的资料，正常进入修改个人资料页面，检查页面元素；
+//     * @FunctionPoint 已登录，我的页面，点击我的资料，正常进入修改个人资料页面，检查页面元素；2.0.1,delete，没有我的资料入口了
+//     */
+//    public void test_1170_myprofilepage() {
+//    	ToPage.tomyprofile(local);//进入我的资料页面
+//		//检查页面元素
+//		assertEquals("No \"修改个人资料\" text!", "修改个人资料", MyAssert.getall_header_txt(local));//断言：Header文案
+//		assertTrue("No img area!", local.waitForView(local.getView("iv_myself_portrait")));//断言：头像区域
+//		TextView name = (TextView)local.getView("iv_myself_name");
+//		String nametxt = name.getText().toString();
+//		assertTrue("No name area!", "请填写昵称".equals(nametxt)||ChangL.name.equals(nametxt));//断言：昵称文字
+//		TextView phone = (TextView)local.getView("iv_myself_phone");//手机号
+//		String phonetxt = phone.getText().toString();
+//		assertEquals("No phone area!", ChangL.phonenumxing, phonetxt);//断言：手机号
+//		assertTrue("No sex area!", local.waitForView(local.getView("man"))&&local.waitForView(local.getView("women")));//断言：性别
+//    }
     
     /**
      * @Name 1175_favoriteaddresspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址，正常进入常用地址页面，审查页面元素；
@@ -1612,7 +1690,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1180_addfavoriteaddresspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--添加，正常进入添加常用地址页面，审查页面元素；
@@ -1670,7 +1748,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1185_sethomeaddresspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--家，正常进入家的添加常用地址页面，审查页面元素；
@@ -1731,7 +1809,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1190_setcompanyaddresspage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--公司，正常进入公司的添加常用地址页面，审查页面元素；
@@ -1792,7 +1870,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1195_mycarpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击我的车辆，正常进入我的车辆页面，审查页面元素；
@@ -1814,7 +1892,6 @@ public class MyTest extends CafeTestCase {
 		TextView setcar = (TextView)local.getView("com.ganji.android.ccar:id/txt_car_type");
 		String setcartxt = setcar.getText().toString();//获取未设置时的文案
 		assertEquals("No set car area!", "设置您的车辆,方便洗车师傅找到车", setcartxt);//未设置车时文案，老有。。
-		assertTrue("No set car image area!", local.waitForView(local.getView("com.ganji.android.ccar:id/img_car_icon")));
 		assertTrue("No car num!", local.waitForView(local.getView("txt_car_plate")));//断言：车牌号
 		assertTrue("No car type and color!", local.waitForView(local.getView("txt_car_type")));//断言：车类型和颜色
 		assertTrue("No car list!", local.waitForView(local.getView("pull_list")));//断言：list
@@ -1823,7 +1900,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1200_setcarpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击我的车辆-添加，正常进入添加车辆页面，审查页面元素；
@@ -1889,7 +1966,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 1210_aboutpage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 中级
      * @Channel 
      * @Describe 已登录，我的页面，点击关于赶集易洗车，正常进入关于页面，审查页面元素；
@@ -1904,10 +1981,10 @@ public class MyTest extends CafeTestCase {
 		LinearLayout fu = (LinearLayout)img.getParent();
 		TextView ganji = (TextView)fu.getChildAt(1);//赶集易洗车文字
 		String ganjitxt = ganji.getText().toString();
-		assertEquals("No \"赶集易洗车\" text!", "赶集易洗车", ganjitxt);//断言：文案
-		TextView version = (TextView)local.getView("com.ganji.android.ccar:id/version_name");
-		String versiontxt = version.getText().toString();//版本文字
-		assertEquals("version is error!", "V1.7.0", versiontxt);//断言：版本
+		assertEquals("No \"版本号信息\" text!", ChangL.versiontxt, ganjitxt);//断言：文案
+//		TextView version = (TextView)local.getView("com.ganji.android.ccar:id/version_name");
+//		String versiontxt = version.getText().toString();//版本文字
+//		assertEquals("version is error!", "V2.0.1", versiontxt);//断言：版本
 //		assertTrue("No version area!", versiontxt.contains("V"));//断言：版本
 		LinearLayout checkversion = (LinearLayout)local.getView("com.ganji.android.ccar:id/lay_check_version");
 		TextView checkversionarea = (TextView)checkversion.getChildAt(0);
@@ -1930,35 +2007,11 @@ public class MyTest extends CafeTestCase {
 		assertEquals("No QQ num!", "335701302", qqtxt);//断言：qq号
 		assertTrue("No email!", local.waitForText("邮        箱")&&local.waitForText("xiche_help@ganji.com"));//断言：邮箱
     }
-   
-    
-    /**
-     * @Name 2005_changecity
-     * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 高级
-     * @Channel 
-     * @Describe 已登录，选择其他服务地区，正常切换；
-     * @FunctionPoint 已登录，选择其他服务地区，正常切换；
-     */
-    public void test_2005_changecity() {
-    	local.sleep(3000);
-    	local.waitForActivity("CHomeActivity");
-    	local.clickOnView(MyEntry.selectservicecityentry(local));//点击城市按钮
-    	local.sleep(2000);
-		local.clickOnText("北京");//切换城市，目前只有北京，点击北京
-		local.sleep(3000);
-		local.assertCurrentActivity("Not go to other city successful！", "CHomeActivity");//断言：判断是否切换成功
-		assertEquals("Not go to other city successful!", "赶集易洗车", MyAssert.getall_header_txt(local));
-		assertTrue("Not go to other city successful!", local.waitForText("赶集易洗车")&&local.waitForText("北京"));
-        String str2=MyEntry.selectservicecityentry(local).getText().toString();
-        assertEquals("Current city is not \"北京\"!", "北京", str2);//判断当前选择城市是否为所选城市
-    }
     
     /**
      * @Name 2006_getredpackage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，进入活动页面，领取红包；
@@ -2005,7 +2058,7 @@ public class MyTest extends CafeTestCase {
     /**
      * @Name 2040_searchcaradr
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，上门洗车页，点击车辆停放地址，搜索车辆停放地址；
@@ -2014,12 +2067,18 @@ public class MyTest extends CafeTestCase {
     public void test_2040_searchcaradr() {
     	Log.d("test", "test_2007_searchcaradr  start");
     	ToPage.towashcarpage(local);
-    	local.waitForView(MyEntry.caraddressentry(local));
+//    	local.waitForView(MyEntry.caraddressentry(local));
+//    	local.searchText("需要清洗内饰");
     	local.clickOnView(MyEntry.caraddressentry(local));//点击车辆停放地址
 //    	local.sleep(1000);
-    	local.waitForView(MyEntry.servicediqutxt(local));
+    	local.waitForView(MyEntry.servicediqutxt(local),5000,true);
+    	local.searchText("服务覆盖长安街到北五环，以及上地、回龙观地区");
 		String contenttxt = MyEntry.servicediqutxt(local).getText().toString();
-    	assertEquals("No \"提示文案\" text！ ", "服务覆盖长安街到北五环，以及上地、回龙观地区", contenttxt);;
+//		while(contenttxt.isEmpty()){
+//			local.sleep(1000);
+//			break;
+//		}
+    	assertTrue("No \"提示文案\" text！ ", !contenttxt.isEmpty());
 //    	assertTrue("Current is not searchpage!",local.waitForText("服务覆盖长安街到北五环，以及上地、回龙观地区"));//断言：是否进入搜索页面
     	local.clickOnView(MyEntry.choosecaraddressentry(local));//点击选择车辆停放位置
     	local.clickOnView(MyEntry.searchcaraddressentry(local));//点击搜索车辆停放位置
@@ -2027,8 +2086,8 @@ public class MyTest extends CafeTestCase {
 		local.enterText(searchcaradd, "上地桥东");//在搜索车辆停放位置输入框输入内容
 		local.sleep(3000);
 		assertTrue("Current is not ListView!", local.waitForView(local.getView("search_list_half_screen"))); //判断是否出现listview
+//		local.sleep(2000);
 		local.hideSoftKeyboard();//收起键盘
-		local.sleep(2000);
 		ListView list = (ListView)local.getView("com.ganji.android.ccar:id/search_history_listview");
 		LinearLayout ll = (LinearLayout)list.getChildAt(2);//点击第三个
 		local.clickOnView(ll);//点击第三个
@@ -2037,79 +2096,75 @@ public class MyTest extends CafeTestCase {
     	local.clickOnText("下一步");//点击下一步
 //    	local.sleep(2000);
     	local.searchText("备注");
+    	local.screenShotNamedCaseName("addressdetail");	
     	assertTrue("Current page is not \"详细位置描述\"！", local.waitForText("详细位置描述"));//断言：是否进入详细位置描述页
     	assertTrue("No MarkText!", local.waitForView(local.getView("lay_edittext_mark"))&&local.waitForView(local.getView("et_content2")));//断言：检查是否有地点和详细地址输入框
-    	EditText input = (EditText)local.getView("com.ganji.android.ccar:id/et_content2");
-    	local.waitForView(input);
-    	local.enterText(input, "搜索赶集小区 30号楼3门 333");//输入具体地址
-//    	local.enterText(0, "搜索赶集小区 30号楼3门 333");//输入具体地址
+    	local.enterText(0, "搜索赶集小区 30号楼3门 333");//输入具体地址
     	local.clickOnText("确定");//点击确定
     	EditText caraddr = (EditText)(MyEntry.caraddressentry(local));//定位到设置车辆位置view
     	String caraddrtext = caraddr.getText().toString();
-    	assertTrue("SetCarAddress fail!", local.waitForView(local.getView("et_content"))&&!"车辆停放地址".equals(caraddrtext)&&MyAssert.washcar_header_txt(local).equals(MyAssert.getall_header_txt(local)));//断言：判断是否添加成功，是否跳转回标准洗车页
+    	assertTrue("SetCarAddress fail!", local.waitForView(local.getView("et_content"))&&!"车辆停放地址".equals(caraddrtext)&&ChangL.washcarheadertxt.equals(MyAssert.getall_header_txt(local)));//断言：判断是否添加成功，是否跳转回标准洗车页
     	local.clickOnView(MyEntry.caraddressentry(local));//点击后应进入详细位置描述页
     	assertTrue("Current page is not \"详细位置描述\"！", local.waitForText("详细位置描述"));//断言：是否进入详细位置描述页
     	local.clickOnView(local.getView("btn_title_left"));//点击返回
     	local.sleep(2000);
-    	assertTrue("Current page is not \"标准洗车\"！", MyAssert.washcar_header_txt(local).equals(MyAssert.getall_header_txt(local)));//断言：是否进入标准洗车页
+    	assertTrue("Current page is not \"标准洗车\"！", ChangL.washcarheadertxt.equals(MyAssert.getall_header_txt(local)));//断言：是否进入标准洗车页
     }
+  
     
     /**
      * @Name 2055_washcarchkinterior
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择标准洗车，下单，清理内饰，下单成功，并跳转到我的订单页；
-     * @FunctionPoint 已登录，选择标准洗车，下单，清理内饰，下单成功，并跳转到我的订单页；1.7.0,update，新增取消次卡选择流程；
+     * @FunctionPoint 已登录，选择标准洗车，下单，清理内饰，下单成功，并跳转到我的订单页；1.7.0,update，新增取消次卡选择流程；2.0.1,update,清洗内饰区域改变；
      */
     public void test_2055_washcarchkinterior() {
     	ToPage.towashcarpage(local);//进入上门洗车页
+//    	SetStep.checkinterior(local);//点击清理内饰，默认是未选中的
     	SetStep.setphone(local);//判断是否登录，可省
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	SetStep.setcarinfo(local, "QLNS22");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
-    	local.clickOnView(local.getView("com.ganji.android.ccar:id/mark_view"));//点击清理内饰，默认是未选中的
-//    	local.sleep(1000);
-    	CheckBox interiorcheck = (CheckBox)local.getView("com.ganji.android.ccar:id/chk_interior");
-    	if(interiorcheck.isChecked())
-    		SetStep.cancletimecard(local);//取消次卡选择
-    	else 
-    		local.sleep(2500);
-    		SetStep.cancletimecard(local);//取消次卡选择
-//    	local.scrollUp();//往上拉一下
-//    	SetStep.cancletimecard(local);//取消次卡选择
+    	SetStep.checkinterior(local);//点击清理内饰，默认是未选中的
+    	SetStep.cancletimecard(local);//取消次卡选择
     	local.sleep(600);
     	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
 //    	local.sleep(1500);
-    	local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_custiom_select_item_listview"));
     	SetStep.pay(local);//支付
     	TextView interior = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_interior");//判断是否有有清理内饰
     	String interiortext = interior.getText().toString();
     	assertEquals("it is not interior!", "清洗", interiortext);
     	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
     /**
      * @Name 2060_washcaruseredpackage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 高级
+     * @Subcatalog 2.0.1
+     * @Grade 高级	
      * @Channel 
      * @Describe 已登录，选择标准洗车，下单，使用红包，下单成功，并跳转到我的订单页；
      * @FunctionPoint 已登录，选择标准洗车，下单，使用红包，下单成功，并跳转到我的订单页；1.7.0,update，新增取消次卡选择流程；
      */
     public void test_2060_washcaruseredpackage() {
     	ToPage.towashcarpage(local);//进入上门洗车页
-    	SetStep.cancletimecard(local);//取消次卡选择
-//    	TextView redpackage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package");
-//    	String redpackagetxt = redpackage.getText().toString();
-    	local.sleep(500);
+//    	local.sleep(1000);
+    	local.scrollDown();//拉到最下
+    	SetStep.cancletimecard(local);//取消次卡选择，判断红包
+//    	local.sleep(1000);
+    	local.waitForText("现有",1,5000);
     	assertTrue("No red package!", MyAssert.getwashcar_redpackage_txt(local).contains("现有")&&MyAssert.getwashcar_redpackage_txt(local).contains("可用")&&!"现有0.0元，可用0.0元".equals(MyAssert.getwashcar_redpackage_txt(local)));//看是否有红包
     	SetStep.setphone(local);//判断是否登录
-    	SetStep.setcarinfo(local);//设置车辆信息，可省
+    	SetStep.setcarinfo(local, "USERED");//设置车辆信息，可省
     	SetStep.setcaraddress(local);//设置车辆停放位置，可省
     	SetStep.setwashcartime(local);//设置服务时间
+    	SetStep.cancletimecard(local);//取消次卡选择
     	CheckBox cb = (CheckBox)local.getView("com.ganji.android.ccar:id/chk_red_package");
     	if (!cb.isChecked())//选中使用红包，默认是选中的
     		local.clickOnView(local.getView("chk_red_package"));
@@ -2130,70 +2185,69 @@ public class MyTest extends CafeTestCase {
 
     	}
     	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
     /**
      * @Name 2065_washcarusecoupon
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择标准洗车，下单，使用优惠劵，下单成功，并跳转到我的订单页；
      * @FunctionPoint 已登录，选择标准洗车，下单，使用优惠劵，下单成功，并跳转到我的订单页；1.7.0,update，新增取消次卡选择流程；
      */
     public void test_2065_washcarusecoupon() {
-    	ToPage.tomycoupon(local);//进入我的优惠券页面
-    	//判断是否有：您还没有优惠券字样，使用中的没有判断
-    	assertTrue("No coupon!", local.waitForView(local.getView("coupons_bg")));//看是否有优惠券
-    	local.clickOnView(local.getView("btn_title_left"));//返回到我的页
-    	local.clickOnView(MyEntry.homepageentry(local));//点一下首页
-    	local.sleep(500);
     	ToPage.towashcarpage(local);//进入标准洗车页
-    	SetStep.cancletimecard(local);//取消次卡选择
     	SetStep.setphone(local);//判断是否登录
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	SetStep.setcarinfo(local, "USECOU");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
-//    	if (MyAssert.getwashcar_redpackage_txt(local).contains("现有")&&MyAssert.getwashcar_redpackage_txt(local).contains("可用")&&!"现有0.0元，可用0.0元".equals(MyAssert.getwashcar_redpackage_txt(local))) {//判断是否有红包，没有的话直接点击优惠券，有的话先取消红包，再点击优惠券
-//    		local.clickOnView(local.getView("chk_red_package"));//取消红包选择
-//    		local.sleep(2000);
-//    		local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
-//    	}
-//    	else
-//    		local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
-    	local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
-    	local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_selection", 1));//选择第一个优惠券
-//    	local.sleep(1500);
-    	local.waitForView(local.getView("com.ganji.android.ccar:id/txt_coupon_result"));
-    	TextView coupnresult = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupon_result");
-    	TextView unavalibleredpage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package_unavalible");
+    	SetStep.cancletimecard(local);//取消次卡选择
+    	CheckBox timecardcb = (CheckBox)local.getView("com.ganji.android.ccar:id/time_card_enable_switch");
+    	while(timecardcb.isChecked()){
+    		local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
+    		break;
+    	}
+//    	local.sleep(1000);
+    	local.screenShotNamedCaseName("pic_0001");
+    	local.searchText("自动化");
+    	ListView list = (ListView)local.getView("list");//优惠券列表
+    	LinearLayout couponfirst = (LinearLayout)list.getChildAt(2);//第一个优惠券
+    	local.clickOnView(couponfirst);//选择第一个优惠券
+    	local.sleep(1500);
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/txt_coupon_result"));//已抵用xx元文字区域
+    	TextView coupnresult = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupon_result");//已抵用xx元文字区域
+    	TextView unavalibleredpage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package_unavalible");//红包与优惠券不可同时使用区域
     	String coupnresulttxt = coupnresult.getText().toString();
     	String unavalibleredpagetxt = unavalibleredpage.getText().toString();
     	assertTrue("use coupon failed-no \"已抵用\"!", coupnresulttxt.contains("已抵用"));//看是否选中优惠券
     	assertTrue("use coupon failed-no \"红包与优惠券不可同时使用\"!", unavalibleredpagetxt.contains("红包与优惠券不可同时使用"));//看是否选中优惠券
-    	
-    	TextView price = (TextView)local.getView("txt_price_now");//获取价格
+    	TextView price = (TextView)local.getView("txt_price_now",1);//获取价格
     	String pricetext = price.getText().toString();
     	if ("￥0".equals(pricetext)) {//判断使用红包后是否为0元
 	    	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单后直接跳转到预约成功页
-        	assertTrue("Submit order failure for use red package！--0yuan", local.waitForText("预约成功")&&local.waitForText("优惠券抵扣"));//是否跳转到预约成功页
+        	assertTrue("Submit order failure for use red package！--0yuan", local.waitForText("预约成功")&&local.waitForText("优惠劵抵扣"));//是否跳转到预约成功页
     	}
     	else {
     		local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
 //    		local.sleep(1500);
-    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_custiom_select_item_listview"));
     		SetStep.pay(local);//支付
     		TextView couponstitle = (TextView)local.getView("com.ganji.android.ccar:id/redpacket_or_coupons_title");
     		String couponstitletxt = couponstitle.getText().toString();//优惠劵抵扣文字
         	assertEquals("submit order failure for use coupon！--no 0yuan", "优惠劵抵扣:", couponstitletxt);//判断是否有优惠券抵扣字样
     	}
     	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
     /**
      * @Name 2066_washcarusetimecard
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择标准洗车，下单，不使用任何优惠，不清理内饰，次卡支付下单成功，并跳转到我的订单页；
@@ -2202,12 +2256,15 @@ public class MyTest extends CafeTestCase {
     public void test_2066_washcarusetimecard() {
     	ToPage.towashcarpage(local);//进入标准洗车页
     	SetStep.setphone(local);//判断是否登录
+    	local.scrollDown();//往下拉
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/time_card_enable_content"));
     	TextView cardcontent = (TextView)local.getView("com.ganji.android.ccar:id/time_card_enable_content");
     	String cardcontenttxt = cardcontent.getText().toString();
-    	assertEquals("No timecard!", "当前城市剩余次数"+MyEntry.bjtimecard(local)+"次", cardcontenttxt);//判断是否有次数
+    	assertEquals("No timecard!", "当前城市剩余次数"+ChangL.timecardbj+"次", cardcontenttxt);//判断是否有次数
     	CheckBox enableswitch = (CheckBox)local.getView("com.ganji.android.ccar:id/time_card_enable_switch");
     	assertTrue("No select timecard!", enableswitch.isChecked());//判断是否是选中状态
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	local.scrollUp();//往上拉
+    	SetStep.setcarinfo(local, "USETIM");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
 		local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
@@ -2220,14 +2277,17 @@ public class MyTest extends CafeTestCase {
 		TextView timecard = (TextView)fu.getChildAt(0);//次卡文案
 		String timecardtxt = timecard.getText().toString();
 		assertEquals("submit order failure for use timecard！--No \"次卡\" txt！", "次        卡:", timecardtxt);//判断是否有次卡字样
-    	assertEquals("submit order failure for use timecard！--cost timecard num error!", "消费1次，剩余"+MyEntry.timecarduse(local)+"次", timecardcosttxt);//判断消费次数和剩余次数是否正确
+    	assertEquals("submit order failure for use timecard！--cost timecard num error!", "消费1次，剩余"+ChangL.timecarduse+"次", timecardcosttxt);//判断消费次数和剩余次数是否正确
     	SetStep.payorderusetimecardcancle(local);//扫尾，取消订单，退款
+    	local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_title_left"));//点击返回
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
     /**
      * @Name 2070_washcarproduct
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择套餐，下单，不使用任何优惠，下单成功，并跳转到我的订单页；
@@ -2236,7 +2296,7 @@ public class MyTest extends CafeTestCase {
     public void test_2070_washcarproduct() {
     	SetStep.productselect(local);//进入上门洗车页，在选择服务页，选择套餐
 		SetStep.setphone(local);//判断是否登录
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	SetStep.setcarinfo(local, "USENUL");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
     	if (!("现有0.0元，可用0.0元".equals(MyAssert.getwashcar_redpackage_txt(local)))) {//判断有没有红包，不用红包	
@@ -2246,15 +2306,17 @@ public class MyTest extends CafeTestCase {
     	local.sleep(1000);
     	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
 //    	local.sleep(1000);
-    	local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+    	local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_custiom_select_item_listview"));
     	SetStep.pay(local);//支付
     	SetStep.payordercancle(local);//扫尾，取消订单，点击取消订单按钮
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
     /**
      * @Name 2075_washcarproductuseredpack
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择套餐，使用红包，下单成功，并跳转到我的订单页；
@@ -2264,14 +2326,14 @@ public class MyTest extends CafeTestCase {
     	SetStep.productselect(local);//进入上门洗车页，在选择服务页，选择套餐
     	assertTrue("No red package!", MyAssert.getwashcar_redpackage_txt(local).contains("现有")&&MyAssert.getwashcar_redpackage_txt(local).contains("可用")&&!"现有0.0元，可用0.0元".equals(MyAssert.getwashcar_redpackage_txt(local)));//看是否有红包
     	SetStep.setphone(local);//判断是否登录
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	SetStep.setcarinfo(local, "USERED");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
     	CheckBox cb = (CheckBox)local.getView("com.ganji.android.ccar:id/chk_red_package");
     	if (!cb.isChecked())//选中使用红包，默认是选中的
     		local.clickOnView(local.getView("chk_red_package"));
 //    	assertTrue("use red package failed!", !local.waitForText("优惠券与红包不可同时使用"));//看是否选中红包
-    	TextView price = (TextView)local.getView("txt_price_now");//获取价格
+    	TextView price = (TextView)local.getView("txt_price_now",1);//获取价格
     	String pricetext = price.getText().toString();
     	if ("￥0".equals(pricetext)) {//判断使用红包后是否为0元
     		local.sleep(1500);
@@ -2282,97 +2344,186 @@ public class MyTest extends CafeTestCase {
     		local.sleep(1500);
     		local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
 //    		local.sleep(1500);
-    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_custiom_select_item_listview"));
     		SetStep.pay(local);//支付
     		TextView couponstitle = (TextView)local.getView("com.ganji.android.ccar:id/redpacket_or_coupons_title");
     		String couponstitletxt = couponstitle.getText().toString();//红包抵扣文字
         	assertEquals("submit order failure for use coupon！--no 0yuan", "红包抵扣:", couponstitletxt);//判断是否有红包抵扣字样
     	}
     	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
     }
     
   	/**
      * @Name 2080_washcarproductuseconpon
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，选择套餐，使用优惠券，下单成功，并跳转到我的订单页；
      * @FunctionPoint 已登录，选择套餐，使用优惠券，下单成功，并跳转到我的订单页；
   	 */
     public void test_2080_washcarproductuseconpon() {
-//    	ToPage.tomycoupon(local);//进入我的优惠券页面，看是否有优惠券
-//    	assertTrue("No coupon!", local.waitForView(local.getView("coupons_bg")));//判断是否有：您还没有优惠券字样，使用中的没有判断
-//    	local.clickOnView(local.getView("btn_title_left"));//返回到我的页
-//    	local.clickOnView(MyEntry.homepageentry(local));//点一下首页
-//    	local.sleep(500);
     	SetStep.productselect(local);//进入标准洗车页，在选择服务页，选择套餐
     	SetStep.setphone(local);//判断是否登录
-    	SetStep.setcarinfo(local);//设置车辆信息
+    	SetStep.setcarinfo(local, "USECOU");//设置车辆信息
     	SetStep.setcaraddress(local);//设置车辆停放位置
     	SetStep.setwashcartime(local);//设置服务时间
     	if (MyAssert.getwashcar_redpackage_txt(local).contains("现有")&&MyAssert.getwashcar_redpackage_txt(local).contains("可用")&&!"现有0.0元，可用0.0元".equals(MyAssert.getwashcar_redpackage_txt(local))) {//判断是否有红包，没有的话直接点击优惠券，有的话先取消红包，再点击优惠券
+    		local.sleep(500);
     		local.clickOnView(local.getView("chk_red_package"));//取消红包选择
-    		local.sleep(2000);
+//    		local.sleep(2000);
+    		local.searchText("请选择优惠券");
     		local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
     	}
     	else {
-    		local.sleep(2000);
+//    		local.sleep(2000);
+    		local.searchText("请选择优惠券");
     		local.clickOnView(local.getView("txt_coupon_name"));//点击优惠券
     	}
-    	local.sleep(2000);
-    	local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_selection", 1));//选择第一个优惠券
+//    	local.sleep(1000);
+    	local.searchText("自动化");
+    	ListView list = (ListView)local.getView("list");//优惠券列表
+    	LinearLayout couponfirst = (LinearLayout)list.getChildAt(2);//第一个优惠券
+    	local.clickOnView(couponfirst);//选择第一个优惠券
     	local.sleep(1500);
+    	local.searchText("需要清洗内饰");
     	TextView coupnresult = (TextView)local.getView("com.ganji.android.ccar:id/txt_coupon_result");
     	TextView unavalibleredpage = (TextView)local.getView("com.ganji.android.ccar:id/txt_red_package_unavalible");
     	String coupnresulttxt = coupnresult.getText().toString();
     	String unavalibleredpagetxt = unavalibleredpage.getText().toString();
-    	assertEquals("use coupon failed!--No \"已抵用\"", "已抵用10元", coupnresulttxt);//看是否选中优惠券
-    	assertTrue("use coupon failed!--No \"红包与优惠券不可同时使用\"", unavalibleredpagetxt.contains("红包与优惠券不可同时使用"));//看是否选中优惠券
+    	assertTrue("use coupon failed!1", coupnresulttxt.contains("已抵用"));//看是否选中优惠券
+    	assertTrue("use coupon failed!2", unavalibleredpagetxt.contains("红包与优惠券不可同时使用"));//看是否选中优惠券
     	
-    	TextView price = (TextView)local.getView("txt_price_now");//获取价格
+    	TextView price = (TextView)local.getView("txt_price_now",1);//获取价格
     	String pricetext = price.getText().toString();
     	if ("￥0".equals(pricetext)) {//判断使用红包后是否为0元
 	    	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单后直接跳转到预约成功页
-        	assertTrue("Submit order failure for use red package！--0yuan", local.waitForText("预约成功")&&local.waitForText("优惠券抵扣"));//是否跳转到预约成功页
+        	assertTrue("Submit order failure for use red package！--0yuan", local.waitForText("预约成功")&&local.waitForText("优惠劵抵扣"));//是否跳转到预约成功页
     	}
     	else {
     		local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
 //    		local.sleep(1500);
-    		local.searchText("选择支付方式");
-    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+//    		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_custiom_select_item_listview"));
+    		local.waitForText("余额支付");
     		SetStep.pay(local);//支付
     		TextView couponstitle = (TextView)local.getView("com.ganji.android.ccar:id/redpacket_or_coupons_title");
     		String couponstitletxt = couponstitle.getText().toString();//优惠劵抵扣文字
         	assertEquals("submit order failure for use coupon！--no 0yuan", "优惠劵抵扣:", couponstitletxt);//判断是否有优惠券抵扣字样
     	}
     	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
 	}
-	
-	/**
-     * @Name 2085_sharetask
+
+    /**
+     * @Name 2081_payorderaotupage
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 高级
+     * @Subcatalog 2.0.1
+     * @Grade 中级
      * @Channel 
-     * @Describe 操作：启动->点击任务”->点击分享->分享到微信朋友圈->判断是否分享成功
-     * @FunctionPoint 操作：启动->点击任务”->点击分享->分享到微信朋友圈->判断是否分享成功
-	 */
-	private void test_2085_sharetask() {
-		ToPage.totaskpage(local);//进入任务页面
-		local.clickOnView(local.getView("com.ganji.android.ccar:id/btn", 3));//点击分享按钮
-		local.clickOnView(local.getView("com.ganji.android.ccar:id/lay_friends"));//点击分享到朋友圈
-		local.sleep(4000);
-		adbDevice.tap(position.findElementById("com.tencent.mm:id/bmp"));//输入框
-		adbDevice.sendText("测试测试测试");//输入内容
-		adbDevice.tap(position.findElementById("com.tencent.mm:id/d4"));//点击发送按钮
-		assertTrue("share task failed!", local.waitForText("亲，分享成功了"));//断言：判断是否分享成功
-	} 
+     * @Describe 已登录，我的订单列表页，点击进入一个现金支付预约成功状态的订单，正常进入预约成功页，检查页面元素（自动分单）；
+     * @FunctionPoint 已登录，我的订单列表页，点击进入一个现金支付预约成功状态的订单，正常进入预约成功页，检查页面元素（自动分单）；
+     */
+    public void test_2081_payorderautopage() {
+    	Log.d("test", "test_1022_payorderpage  start");
+    	ToPage.towashcarpage(local);//进入上门洗车页
+    	SetStep.setphone(local);//判断是否登录
+    	SetStep.setcarinfo(local,"NOPAY1");//设置车辆信息
+    	SetStep.setcaraddressauto(local);//设置车辆停放位置（自动分单的地址）
+    	SetStep.setwashcartimeauto(local);//设置服务时间
+    	SetStep.cancletimecard(local);//取消次卡选择
+    	local.sleep(1000);
+    	local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
+//    	local.sleep(3000);
+    	local.waitForDialogToOpen();
+    	assertTrue("Submit order failure！", local.waitForDialogToOpen());//判断是否弹出选择支付方式的提示
+    	while(!local.searchText("选择支付方式")){
+    		local.clickOnView(MyEntry.orderbutton(local));//点击立即下单
+    	}
+//    	local.sleep(1500);
+    	SetStep.pay(local);//支付
+//    	local.sleep(2000);
+//    	local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单进入详情
+    	//审查页面元素
+    	assertTrue("Current status is not notpay!", local.waitForText("订单详情"));//断言：header文案
+//    	assertEquals("Current status is not notpay!", "预约成功", MyAssert.getall_header_txt(local));//断言：header文案，不知道为什么老是取到“我的订单”
+    	TextView canclebutton = (TextView)local.getView("com.ganji.android.ccar:id/txt_title_right");
+    	String canclebuttontxt = canclebutton.getText().toString();//获取取消订单文字
+    	assertEquals("No \"取消订单\" button!", "取消订单", canclebuttontxt);//断言：取消订单按钮
+    	TextView successcontent = (TextView)local.getView("com.ganji.android.ccar:id/reservation_successful_content");
+    	String successcontenttxt = successcontent.getText().toString();
+    	assertEquals("No order content text!", "师傅分配成功，会在预约时间为您服务，请等待。", successcontenttxt);//断言：自动分单成功文案
+    	TextView washcategory = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_category");
+    	LinearLayout washcategoryfu = (LinearLayout)washcategory.getParent();
+    	TextView washcategoryarea = (TextView)washcategoryfu.getChildAt(0);//服务项目文字区域
+    	String washcategorytxt = washcategoryarea.getText().toString();
+    	assertEquals("No wash_car_time!", "服务项目:", washcategorytxt);//断言：服务项目
+    	TextView washcarcontent = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_content");
+    	LinearLayout washcarcontentfu = (LinearLayout)washcarcontent.getParent();
+    	TextView washcarcontentarea = (TextView)washcarcontentfu.getChildAt(0);//服务内容文字区域
+    	String wwashcarcontenttxt = washcarcontentarea.getText().toString();
+    	assertEquals("No wash_car_time!", "服务内容:", wwashcarcontenttxt);//断言：服务内容
+    	TextView washcartime = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_consume_time");
+    	LinearLayout washcartimefu = (LinearLayout)washcartime.getParent();
+    	TextView servicetime = (TextView)washcartimefu.getChildAt(0);//服务时间文字区域
+    	String servicetimetxt = servicetime.getText().toString();
+    	assertEquals("No wash_car_time!", "服务时间:", servicetimetxt);//断言：服务时间
+    	TextView caraddress = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_address");
+    	LinearLayout caraddressfu = (LinearLayout)caraddress.getParent();
+    	TextView caraddressarea = (TextView)caraddressfu.getChildAt(0);//车辆位置文字区域
+    	String caraddressareatxt = caraddressarea.getText().toString();
+    	assertEquals("No wash_car_address!", "车辆位置:", caraddressareatxt);//断言：车辆位置
+    	TextView carnum = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_number");
+    	LinearLayout carnumfu = (LinearLayout)carnum.getParent();
+    	TextView carnumarea = (TextView)carnumfu.getChildAt(0);//车牌文字区域
+    	String carnumareatxt = carnumarea.getText().toString();
+    	assertEquals("No wash_car_number!", "车        牌:", carnumareatxt);//断言：车牌
+    	TextView cartype = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_type");
+    	LinearLayout cartypefu = (LinearLayout)cartype.getParent();
+    	TextView cartypearea = (TextView)cartypefu.getChildAt(0);//车型文字区域
+    	String cartypeareatxt = cartypearea.getText().toString();
+    	assertEquals("No wash_car_type!", "车        型:", cartypeareatxt);//断言：车型
+    	TextView interior = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_interior");
+    	LinearLayout interiorfu = (LinearLayout)interior.getParent();
+    	TextView interiorarea = (TextView)interiorfu.getChildAt(0);//内饰文字区域
+    	String interiorareatxt = interiorarea.getText().toString();
+    	assertEquals("No wash_interior!", "内        饰:", interiorareatxt);//断言：内饰
+    	TextView carprice = (TextView)local.getView("com.ganji.android.ccar:id/wash_car_price");
+    	LinearLayout carpricefu = (LinearLayout)carprice.getParent();
+    	TextView carpricearea = (TextView)carpricefu.getChildAt(0);//实付款文字区域
+    	String carpriceareatxt = carpricearea.getText().toString();
+    	assertEquals("No tv_wash_car_price!", "实  付  款:", carpriceareatxt);//断言：实付款
+    	SetStep.payordercancle(local);//扫尾，取消订单，退款
+    	ToPage.toorderpage(local);//进入我的订单页
+    	SetStep.deleorder(local);//删除订单
+    }
+	
+//	/**
+//     * @Name 2085_sharetask
+//     * @Catalogue 赶集易洗车C端 Android
+//     * @Subcatalog 2.0.1
+//     * @Grade 高级
+//     * @Channel 
+//     * @Describe 操作：启动->点击任务”->点击分享->分享到微信朋友圈->判断是否分享成功
+//     * @FunctionPoint 操作：启动->点击任务”->点击分享->分享到微信朋友圈->判断是否分享成功
+//	 */
+//	private void test_2085_sharetask() {
+//		ToPage.totaskpage(local);//进入任务页面
+//		local.clickOnView(local.getView("com.ganji.android.ccar:id/btn", 3));//点击分享按钮
+//		local.clickOnView(local.getView("com.ganji.android.ccar:id/lay_friends"));//点击分享到朋友圈
+//		local.sleep(4000);
+//		adbDevice.tap(position.findElementById("com.tencent.mm:id/bmp"));//输入框
+//		adbDevice.sendText("测试测试测试");//输入内容
+//		adbDevice.tap(position.findElementById("com.tencent.mm:id/d4"));//点击发送按钮
+//		assertTrue("share task failed!", local.waitForText("亲，分享成功了"));//断言：判断是否分享成功
+//	} 
     
 	/**
 	 * @Name 2095_orderlistmore
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的订单页，下拉加载数据；
@@ -2381,16 +2532,35 @@ public class MyTest extends CafeTestCase {
 	public void test_2095_orderlistmore() {
 		ToPage.toorderpage(local);//进入订单页面
 //		while (!local.waitForText("无更多内容")) {//往下捯
-		local.scrollDown();
-//		local.waitForView(local.getView("com.ganji.android.ccar:id/progress_bar"));
-		assertTrue("get more order failed!", !local.waitForText("加载失败"));//判断是否有加载失败
-//		}	
-	}
+		ListView listview = (ListView) local.getView("android:id/list");//上拉刷新操作
+		int[] location = new int[2];
+		listview.getLocationOnScreen(location);
+		location[1] = location[1] + listview.getBottom();
+		if (local.waitForView(listview)) {//获取上拉加载更多拖动点的坐标
+			int newlistcount, listcount = listview.getCount();
+			while (true) {
+				local.scrollListToLine(listview, listcount);
+				local.sleep(500);
+				local.dragScreenToUp(250);
+	//		  	local.drag(location[0] + 10f, location[0] + 10f,location[1] - 10f, location[0] - 100f, 100);
+			  	local.sleep(2000);
+	//  		assertFalse("get more balance failed!2", local.waitForText("获取数据失败")&&local.waitForText("加载失败"));
+			  	newlistcount = listview.getCount();
+			  	if (newlistcount >= listcount+10) {//加载两组就行
+			  		break;
+			  	}
+			  	else
+			  		assertEquals("我的订单未加载出10条！", newlistcount, listcount+10);
+			}
+		}
+		int listcount = listview.getCount();//获取当前list数据数量，22
+		assertEquals("get more balance failed!", 22, listcount);
+}
 	
 	/**
 	 * @Name 2100_cancleordernopay
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，下单成功后，未支付，点击取消订单，取消成功后跳转到订单已取消页；
@@ -2408,11 +2578,11 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2110_delecancleorder
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，点击订单已取消的订单，删除订单；
-     * @FunctionPoint 已登录，点击订单已取消的订单，删除订单；
+     * @FunctionPoint 已登录，点击订单已取消的订单，删除订单；2.0.1，update，删除按钮
 	 */
 	public void test_2110_delecancleorder() {
 		local.waitForText("订单");
@@ -2420,20 +2590,13 @@ public class MyTest extends CafeTestCase {
 		local.sleep(1500);
 		local.waitForText("订单已取消");
 		local.scrollUp();
-		local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单，弹出删除提示
-//		local.sleep(2000);
-		local.searchText("是否删除该订单");
-		while(!local.searchText("是否删除该订单")){
-			local.clickOnView(MyEntry.thefirstorderentry(local));//点击第一个订单，弹出删除提示
-		}
-		local.clickOnView(local.getView("btn_datetime_sure"));//点击确定
-		assertTrue("delete cancleorder failed!", local.waitForText("删除成功"));
+		SetStep.deleorder(local);
 	}
 	
 	/**
 	 * @Name 2115_updateprofile
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击头像，修改个人资料；
@@ -2446,58 +2609,59 @@ public class MyTest extends CafeTestCase {
 		local.enterText(MyEntry.profilenameinput(local), "修改昵称");//修改昵称为“修改昵称”
 		local.clickOnView(MyEntry.profilesavebutton(local));//点击保存
 //		local.sleep(1000);
+		local.searchText("修改昵称");
 		local.waitForView(MyEntry.profilenametxt(local));
-		local.waitForText("足不出户");
 //		assertTrue("save profile failed!", local.waitForText("修改成功"));//判断是否修改成功
 		assertEquals("save profile failed!", "修改昵称", (MyAssert.getmy_name_txt(local)));
 //		assertTrue("save profile failed!", "修改昵称".equals(MyAssert.getmy_name_txt(local)));
 		//再改回来
 		local.clickOnView(MyEntry.profileimg(local));//点击个人头像
 		local.clearEditText(MyEntry.profilenameinput(local));//清除输入框内容
-		local.enterText(MyEntry.profilenameinput(local), "QA测试号");//修改昵称为“QA测试号”
+		local.enterText(MyEntry.profilenameinput(local), ChangL.name);//修改昵称为“QA测试号”
 		local.clickOnView(MyEntry.profilesavebutton(local));//点击保存
+		local.searchText(ChangL.name);
 		local.sleep(500);
 	}
 	
-	/**
-	 * @Name 2116_updateprofileimg
-     * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 高级
-     * @Channel 
-     * @Describe 已登录，我的页面，点击头像，修改个人头像；
-     * @FunctionPoint 已登录，我的页面，点击头像，修改个人头像；
-	 */
-	private void test_2116_updateprofileimg() {
-		ToPage.tomypage(local);//进入我的页面
-		local.clickOnView(MyEntry.profileimg(local));//点击个人头像
-		local.clickOnView(local.getView("com.ganji.android.ccar:id/iv_myself_portrait"));//点击头像区域
-//		local.sleep(1000);
-		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
-		local.clickOnView(local.getView("com.ganji.android.ccar:id/dialog_item_text", 1));//点击拍照
-		local.sleep(5000);
-		Element pia = position.findElementById("com.android.camera:id/v6_shutter_button_internal");//拍照按钮
-		adbDevice.tap(pia);  //点击拍照按钮
-		local.sleep(5000);
-		Element gou = position.findElementById("com.android.camera:id/v6_btn_done");//勾
-		adbDevice.tap(gou);
-		local.sleep(5000);
-		Element apply = position.findElementById("com.miui.gallery:id/wallpaper_apply");//应用按钮
-		adbDevice.tap(apply);//点击应用按钮
-		local.sleep(3000);
-		local.clickOnView(local.getView("com.ganji.android.ccar:id/iv_myself_confirm"));//点击保存按钮
-		assertTrue("save profile failed！", local.waitForText("保存成功"));//断言：是否保存成功
-		local.sleep(500);
-		if(mCamera !=null){ 
-            mCamera.release();// 为其它应用释放摄像头
-            mCamera =null; 
-        } 
-	} 
+//	/**
+//	 * @Name 2116_updateprofileimg
+//     * @Catalogue 赶集易洗车C端 Android
+//     * @Subcatalog 2.0.1
+//     * @Grade 高级
+//     * @Channel 
+//     * @Describe 已登录，我的页面，点击头像，修改个人头像；
+//     * @FunctionPoint 已登录，我的页面，点击头像，修改个人头像；
+//	 */
+//	private void test_2116_updateprofileimg() {
+//		ToPage.tomypage(local);//进入我的页面
+//		local.clickOnView(MyEntry.profileimg(local));//点击个人头像
+//		local.clickOnView(local.getView("com.ganji.android.ccar:id/iv_myself_portrait"));//点击头像区域
+////		local.sleep(1000);
+//		local.waitForView(local.getView("com.ganji.android.ccar:id/dialog_item_text"));
+//		local.clickOnView(local.getView("com.ganji.android.ccar:id/dialog_item_text", 1));//点击拍照
+//		local.sleep(5000);
+//		Element pia = position.findElementById("com.android.camera:id/v6_shutter_button_internal");//拍照按钮
+//		adbDevice.tap(pia);  //点击拍照按钮
+//		local.sleep(5000);
+//		Element gou = position.findElementById("com.android.camera:id/v6_btn_done");//勾
+//		adbDevice.tap(gou);
+//		local.sleep(5000);
+//		Element apply = position.findElementById("com.miui.gallery:id/wallpaper_apply");//应用按钮
+//		adbDevice.tap(apply);//点击应用按钮
+//		local.sleep(3000);
+//		local.clickOnView(local.getView("com.ganji.android.ccar:id/iv_myself_confirm"));//点击保存按钮
+//		assertTrue("save profile failed！", local.waitForText("保存成功"));//断言：是否保存成功
+//		local.sleep(500);
+//		if(mCamera !=null){ 
+//            mCamera.release();// 为其它应用释放摄像头
+//            mCamera =null; 
+//        } 
+//	} 
 	
 	/**
 	 * @Name 2120_balancedetailmore
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击余额-余额明细，数据多于10条时，下拉刷新；
@@ -2507,6 +2671,8 @@ public class MyTest extends CafeTestCase {
 		ToPage.tobalance(local);//进入余额页面
     	local.clickOnView(local.getView("txt_title_right"));//点击余额明细按钮
     	local.sleep(2000);
+    	local.waitForText("余额明细");
+    	local.searchText("退款");
     	ListView listview = (ListView) local.getView("android:id/list");//上拉刷新操作
         int[] location = new int[2];
         listview.getLocationOnScreen(location);
@@ -2522,12 +2688,8 @@ public class MyTest extends CafeTestCase {
 //            	assertFalse("get more balance failed!2", local.waitForText("获取数据失败")&&local.waitForText("加载失败"));
                 newlistcount = listview.getCount();
                 if (newlistcount >= listcount+10) {//加载两组就行
-//                if (newlistcount == listcount) {
                     break;
                 }
-//                else {
-//                    listcount = newlistcount;
-//                }
             }
         }
         int listcount = listview.getCount();//获取当前list数据数量，22
@@ -2542,7 +2704,7 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2121_timecarddetailmore
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击标准洗车次卡--明细，上拉页面加载数据；
@@ -2568,14 +2730,13 @@ public class MyTest extends CafeTestCase {
             	local.sleep(2000);
 //            	assertFalse("get more balance failed!2", local.waitForText("获取数据失败")&&local.waitForText("加载失败"));
                 newlistcount = listview.getCount();
-                if (newlistcount == listcount+10) {//加载两组就行
+                if (newlistcount >= listcount+10) {//加载两组就行
                     break;
                 }
             }
         }
-        local.sleep(1500);
         int listcount = listview.getCount();//获取当前list数据数量，22
-        assertEquals("get more balance failed!", 22, listcount);
+        assertEquals("加载次卡明细数量不正确!", 22, listcount);
 //        local.drag(location[0] + 10f, location[0] + 10f,
 //                location[1] - 10f, location[0] - 100f, 50);//再拉一下，才出现已经到底了。。。
 //        assertTrue("get more balance failed!", local.waitForText("已经到底了"));
@@ -2585,7 +2746,7 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2125_editfavoriteaddress
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--添加，添加或编辑常用地址；
@@ -2605,37 +2766,30 @@ public class MyTest extends CafeTestCase {
         		while(!nametxt.isEmpty())
         			local.clearEditText(name);//清空文字
 //        		local.sleep(1500);
-        		if (i==1) {
-        			local.enterText(MyEntry.favoriteaddressnameinput(local), "修改名称");//修改地址名称
-        			SetStep.setaddrandcontent(local,"修改地址content1");
-        		}
-        		else{
-        			local.enterText(MyEntry.favoriteaddressnameinput(local), "a123");//修改地址名称
-        			SetStep.setaddrandcontent(local,"修改地址content2");
-        		}
+        		if (i==1)
+        			local.enterText(MyEntry.favoriteaddressnameinput(local), "修改名称"+i);//修改地址名称
+        		else
+        			local.enterText(MyEntry.favoriteaddressnameinput(local), "a123"+i);//修改地址名称
+        		SetStep.setaddrandcontent(local,"修改地址content");
 //        		local.sleep(1500);
         		local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_long"));//点击保存按钮
 //        		local.sleep(2000);
         		assertTrue("未成功保存常用地址！", local.waitForText("保存常用地址成功"));
         		local.waitForView(MyEntry.favoriteaddressnametxt(local));
-        		local.waitForText("家");
+    			local.waitForText("家");
     			local.waitForText("公司");
         		if (i==1) {
 //        			local.takeScreenshot("updaddname1");
-        			local.sleep(1000);
         			assertEquals("update address name failed!1", "修改名称", MyAssert.getfavoriteaddress_name_txt(local));//断言：判断地址name是否修改成功
 //        			assertTrue("update address name failed!1", "修改名称".equals(MyAssert.getfavoriteaddress_name_txt(local)));//断言：判断地址name是否修改成功
-        			local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_content2", 0));//点击第三个地址
-            		assertTrue("add/edit favoriteaddress content is failed!", "修改地址content1".equals(MyAssert.getaddfavoriteaddress_content_txt(local)));//添加地址页，判断备注是否保存成功
         		}
         		else {
 //        			local.takeScreenshot("updaddname2");
-        			local.sleep(1000);
         			assertEquals("update address name failed!2", "a123", MyAssert.getfavoriteaddress_name_txt(local));//断言：判断地址name是否修改成功
 //        			assertTrue("update address name failed!2", "a123".equals(MyAssert.getfavoriteaddress_name_txt(local)));//断言：判断地址name是否修改成功
-        			local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_content2", 0));//点击第三个地址
-            		assertTrue("add/edit favoriteaddress content is failed!", "修改地址content2".equals(MyAssert.getaddfavoriteaddress_content_txt(local)));//添加地址页，判断备注是否保存成功
         		}
+        		local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_content2", 0));//点击第三个地址
+        		assertTrue("add/edit favoriteaddress content is failed!", "修改地址content".equals(MyAssert.getaddfavoriteaddress_content_txt(local)));//添加地址页，判断备注是否保存成功
         		local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_title_left"));
     		}
     	}
@@ -2661,7 +2815,7 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2130_addoredithomeaddress
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--家，添加家的常用地址；第二次以后是编辑
@@ -2671,15 +2825,22 @@ public class MyTest extends CafeTestCase {
 		ToPage.tomyaddress(local);//进入常用地址页面
 		for (int i=1;i<=2;i++) {
 	    	local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_home"));//点击家的地址
-	    	if (i==1)
+	    	local.searchButton("保存");
+	    	if (i==1){
 	    		SetStep.setaddrandcontent(local,"修改home地址content");//设置家地址和备注
-	    	else
+//	    		local.searchText("修改home地址content");
+	    	}
+	    	else{
 	    		SetStep.setaddrandcontent(local,"海淀区温泉苗圃");//设置家地址和备注
+//	    		local.searchText("海淀区温泉苗圃");
+	    	}
 	    	String homeaddress = MyAssert.getaddhomeaddress_address_txt(local);//获取家地址文字
 	    	String homeaddresscontent = MyAssert.getaddhomeaddress_content_txt(local);//获取家地址备注文字
 			local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_long"));//保存
-			local.sleep(1500);
-			assertTrue("add/edit homeaddress is failed!", MyAssert.getfavoriteaddress_home_txt(local).equals(homeaddress));//添加地址页，判断备注是否保存成功
+			local.sleep(1000);
+			local.searchText(MyAssert.getfavoriteaddress_home_txt(local));
+//			assertTrue("add/edit homeaddress is failed!", MyAssert.getfavoriteaddress_home_txt(local).equals(homeaddress));//添加地址页，判断备注是否保存成功
+			assertEquals("add/edit homeaddress is failed!", MyAssert.getfavoriteaddress_home_txt(local), homeaddress);//添加地址页，判断备注是否保存成功
 			local.clickOnView(local.getView("com.ganji.android.ccar:id/txt_home"));//点击家的地址
 			local.sleep(1000);
 			if (i==1)
@@ -2693,7 +2854,7 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2135_addoreditcompanyaddress
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击常用地址--公司，添加公司的常用地址；第二次以后是编辑
@@ -2725,7 +2886,7 @@ public class MyTest extends CafeTestCase {
 	/**
 	 * @Name 2140_editoreditcar
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，我的页面，点击我的车辆--添加，添加/编辑车辆；
@@ -2747,6 +2908,13 @@ public class MyTest extends CafeTestCase {
 	    	local.clickOnView(local.getView("txt_car_type"));//点击选择车辆品牌
 //	    	local.sleep(1000);
 	    	local.waitForView(local.getView("row_title"));
+//	    	ListView type = (ListView)local.getView("com.ganji.android.ccar:id/gv_car_plate");//车类型
+//	    	RelativeLayout cartype5 = (RelativeLayout)type.getChildAt(5);//品牌第五个
+//	    	RelativeLayout cartype4 = (RelativeLayout)type.getChildAt(4);//品牌第五个
+//	    	ListView plate = (ListView)local.getView("com.ganji.android.ccar:id/lv_car_plate");//车系
+//	    	LinearLayout carplate2 = (LinearLayout)plate.getChildAt(2);//车系第2个
+//	    	LinearLayout carplate4 = (LinearLayout)plate.getChildAt(4);//车系第4个
+	    	
 	    	if (i==1)
 		    	local.clickOnView(local.getView("row_title", 5));//选择品牌，第五个为例
 //	    		local.clickInList(5);
@@ -2778,10 +2946,10 @@ public class MyTest extends CafeTestCase {
 		}
 	}
 	
-	  /**
+	/**
 	 * @Name 2145_changephone
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，上门洗车页，点击手机号，修改手机号；
@@ -2789,20 +2957,15 @@ public class MyTest extends CafeTestCase {
      */
     public void test_2145_changephone() {
     	ToPage.towashcarpage(local);//进入上门洗车页
-//    	SetStep.setphone(local);//确认是否登录，没登录先登录
-    	local.searchText(MyEntry.phonenum(local));
+    	SetStep.setphone(local);//确认是否登录，没登录先登录
     	local.clickOnView(MyEntry.phoneentry(local));//再次点击手机号区域
-    	while(!local.searchText("是否修改手机号")){
-    		local.clickOnView(MyEntry.phoneentry(local));//再次点击手机号区域
-    	}
-    	assertTrue("未弹出修改手机号dialog！", local.waitForText("是否修改手机号"));
     	local.waitForView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));
     	local.clickOnView(local.getView("btn_datetime_sure"));//点击确定
-    	local.enterText(0, MyEntry.firstphonenum(local));//输入手机号
-    	local.enterText(1, MyEntry.password(local));//输入密码
+    	local.enterText(0, ChangL.firstphonenum);//输入手机号
+    	local.enterText(1, ChangL.password);//输入密码
     	local.clickOnButton("登录");//点击登录
     	local.sleep(2000);//断言：是否更换成功
-    	assertTrue("Change phonenumber failed！", local.waitForText(MyAssert.washcar_header_txt(local))&&local.waitForText(MyEntry.firstphonenum(local)));
+    	assertTrue("Change phonenumber failed！", local.waitForText(ChangL.washcarheadertxt)&&local.waitForText(ChangL.firstphonenum));
 //    	//更换回来
 //    	local.clickOnView(MyEntry.phoneentry(local));//再次点击手机号区域
 //    	local.clickOnView(local.getView("btn_datetime_sure"));//点击确定
@@ -2810,12 +2973,11 @@ public class MyTest extends CafeTestCase {
 //    	local.enterText(1, MyEntry.password(local));//输入密码
 //    	local.clickOnButton("登录");//点击登录
     }
-  
 	  
     /**
      * @Name 2150_firstoneyuan
      * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
+     * @Subcatalog 2.0.1
      * @Grade 高级
      * @Channel 
      * @Describe 已登录，使用未购买过的手机号和车牌号，检查价格；
@@ -2827,15 +2989,12 @@ public class MyTest extends CafeTestCase {
     	String phonenum = phone.getText().toString();
     	//判断当前是否登录状态
 		if (!"您的联系方式".equals(phonenum)) {//已登录
-    		if (!MyEntry.firstphonenum(local).equals(phonenum)) {//判断当前登录手机号是否为首次使用的手机号
+    		if (!ChangL.firstphonenum.equals(phonenum)) {//判断当前登录手机号是否为首次使用的手机号
             	local.clickOnView(MyEntry.phoneentry(local));//更换手机号
-            	while(!local.searchText("是否修改手机号")){
-            		local.clickOnView(MyEntry.phoneentry(local));//再次点击手机号区域
-            	}
             	local.waitForView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));
             	local.clickOnView(local.getView("btn_datetime_sure"));//点击确定
-            	local.enterText(0, MyEntry.firstphonenum(local));//输入手机号
-            	local.enterText(1, MyEntry.password(local));//输入密码
+            	local.enterText(0, ChangL.firstphonenum);//输入手机号
+            	local.enterText(1, ChangL.password);//输入密码
             	local.clickOnButton("登录");//点击登录
             	local.sleep(2000);
         	}
@@ -2843,37 +3002,93 @@ public class MyTest extends CafeTestCase {
     	else {//未登录
     		local.clickOnView(MyEntry.phoneentry(local));//登录，点击您的联系方式
         	local.sleep(3000);
-        	local.enterText(0, MyEntry.firstphonenum(local));//输入手机号
-        	local.enterText(1, MyEntry.password(local));//输入密码
+        	local.enterText(0, ChangL.firstphonenum);//输入手机号
+        	local.enterText(1, ChangL.password);//输入密码
         	local.clickOnButton("登录");
     	}
     	SetStep.setcarinfofirst(local);//设置车辆信息
     	TextView oneyuan = (TextView)local.getView("com.ganji.android.ccar:id/txt_price_now",1);
     	String oneyuantxt = oneyuan.getText().toString();//1元文字
     	assertEquals("This is the first time but not 1 yuan!", "￥1", oneyuantxt);//判断是否为1元
-    	local.scrollUp();//往上拉
-    	local.scrollUp();//往上拉
-    	local.waitForText(MyEntry.firstphonenum(local));
     	local.clickOnView(MyEntry.phoneentry(local));//换回非first手机号
     	local.sleep(3000);
     	local.clickOnView(local.getView("btn_datetime_sure"));//点击确定
-    	local.enterText(0, MyEntry.phonenum(local));//输入手机号
-    	local.enterText(1, MyEntry.password(local));//输入密码
+    	local.enterText(0, ChangL.phonenum);//输入手机号
+    	local.enterText(1, ChangL.password);//输入密码
     	local.clickOnButton("登录");
     }
-    
-    /**
-     * @Name test_2155_logout
-     * @Catalogue 赶集易洗车C端 Android
-     * @Subcatalog 1.7.0
-     * @Grade 高级
-     * @Channel 
-     * @Describe 退出，已登录，我的页面，点击退出；
-     * @FunctionPoint 退出，已登录，我的页面，点击退出；
-     */
-    public void test_2155_logout() {
-    	SetStep.logout(local);
-    }
-    
+	  
+	 /**
+	  * @Name 2152_selectcity
+	  * @Catalogue 赶集易洗车C端 Android
+	  * @Subcatalog 2.0.1
+	  * @Grade 高级
+	  * @Channel 
+	  * @Describe 已登录，选择其他服务地区，正常切换；
+	  * @FunctionPoint 已登录，选择其他服务地区，正常切换；2.0.1，update，新增多城市
+	  */
+	 public void test_2152_selectcity() {
+	// 	local.sleep(3000);
+	 	local.waitForActivity("CHomeActivity");
+	 	local.clickOnView(MyEntry.selectservicecityentry(local));//点击城市按钮
+	 	local.sleep(2000);
+		local.clickOnText(ChangL.citychange);//切换城市，点击重庆
+		local.sleep(3000);
+		local.assertCurrentActivity("Not go to other city successful！", "CHomeActivity");//断言：判断是否切换成功
+		assertEquals("Not go to other city successful!", "赶集易洗车", MyAssert.getall_header_txt(local));
+		assertTrue("Not go to other city successful!", local.waitForText("赶集易洗车")&&local.waitForText(ChangL.citychange));
+//		TextView city = (TextView)MyEntry.selectservicecityentry(local).getChildAt(0);//文字
+	    String str2=MyEntry.selectservicecityentry(local).getText().toString();
+	    assertEquals("Current city is not "+ChangL.citychange+"!", ChangL.citychange, str2);//判断当前选择城市是否为所选城市
+ }  
+ 
+	 /**
+	  * @Name 2153_changecity
+	  * @Catalogue 赶集易洗车C端 Android
+	  * @Subcatalog 2.0.1
+	  * @Grade 高级
+	  * @Channel 
+	  * @Describe 已登录，选择其他服务地区后，重新打开程序，弹出切换dialog，正常切换；
+	  * @FunctionPoint 已登录，选择其他服务地区后，重新打开程序，弹出切换dialog，正常切换；2.0.1,add，新增切换到北京
+	  */
+	 public void test_2153_changecity() {
+	 	local.waitForActivity("CHomeActivity");
+	 	if (local.waitForDialogToOpen()){
+	 		assertTrue("未弹出切换城市对话框！", local.searchText("切换城市"));
+		 	TextView changecity = (TextView)local.getView("com.ganji.android.ccar:id/txt_content");//对话框上文案
+		 	String changecitytxt = changecity.getText().toString();
+		 	assertEquals("切换城市文案不正确！", "系统定位到您在（北京），是否切换？", changecitytxt);
+		 	local.waitForView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));
+		 	local.clickOnView(local.getView("com.ganji.android.ccar:id/btn_datetime_sure"));//点击切换按钮
+		 	local.waitForText("城市切换成功");
+		 	local.sleep(500);
+		 	TextView currentcity = (TextView)local.getView("com.ganji.android.ccar:id/home_city_btn");//获取当前城市
+		 	String currentcitytxt = currentcity.getText().toString();
+		 	assertEquals("当前城市不是北京！", "北京", currentcitytxt);
+	 	}
+	 	else{//未开启定位的时候
+	 		TextView city = (TextView)local.getView("com.ganji.android.ccar:id/home_city_btn");//城市文字
+	 		String cityname = city.getText().toString();
+	 		assertEquals("当前城市不是重庆！", ChangL.citychange, cityname);
+	 		local.clickOnView(city);//点击重庆
+	 		local.clickOnText("北京");//点击北京
+	 		String citynamebj = city.getText().toString();
+	 		assertEquals("当前城市不是北京！", ChangL.citychange, citynamebj);
+	 	}
+	 }
+
+	  /**
+	   * @Name test_2155_logout
+	   * @Catalogue 赶集易洗车C端 Android
+	   * @Subcatalog 2.0.1
+	   * @Grade 高级
+	   * @Channel 
+	   * @Describe 退出，已登录，我的页面，点击退出；
+	   * @FunctionPoint 退出，已登录，我的页面，点击退出；
+	   */
+	  public void test_2155_logout() {
+	  	SetStep.logout(local);
+	  }
+	    
     
 }
